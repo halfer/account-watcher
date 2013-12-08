@@ -48,9 +48,6 @@ function login(params)
 						elementLoggedOut = document.querySelector('h1.PageTitleSignInEE'),
 						titleLoggedOut = elementLoggedOut ? elementLoggedOut.innerText : '',
 
-						elementEmail = document.querySelector('.login-flow h2'),
-						titleEmail = elementEmail ? elementEmail.innerText : '',
-
 						elementAccount = document.querySelector('#header h1'),
 						titleAccount = elementAccount ? elementAccount.innerText : '',
 
@@ -62,14 +59,6 @@ function login(params)
 					{
 						console.log('[ok] Found login screen');
 						pageId = context.constants.PAGE_LOGIN;
-					}
-					// ... or logged in from a previous run, found email request screen...
-					// (note: if we are already in, in fact I think this is not offered again anyway, so
-					// we may be able to delete this bit)
-					else if (titleEmail.indexOf("We'd like to get to know you better") > -1)
-					{
-						console.log('[ok] Found email request screen, already logged in');
-						pageId = context.constants.PAGE_EMAIL_REQUEST;
 					}
 					// ...or logged in from a previous run and found account home page
 					else if (titleAccount.indexOf('YOUR ACCOUNT') > -1)
