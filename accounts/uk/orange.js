@@ -3,7 +3,6 @@
  * 
  * @todo Add delay to loaded handler, so as to reduce load on the remote server
  * @todo Use special methods for console [ok], [debug], [error] etc
- * @todo Switch any system.stdOut/stdErr to console.log
  * @todo Can we reduce reliance on full URLs?
  * @todo Can we get Orange working without SSL security disabled?
  */
@@ -17,12 +16,12 @@ var params = JSON.parse(jsonString);
 // Check we have the necessary parameters
 if (!params.username)
 {
-	system.stderr.writeLine('[error] This script requires a username');
+	console.log('[error] This script requires a username');
 	phantom.exit();
 }
 if (!params.password)
 {
-	system.stderr.writeLine('[error] This script requires a password');
+	console.log('[error] This script requires a password');
 	phantom.exit();
 }
 
