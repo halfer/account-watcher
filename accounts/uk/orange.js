@@ -1,5 +1,11 @@
 /* 
  * Script to obtain useful information from an Orange Your Account login in the UK.
+ * 
+ * @todo Add delay to loaded handler, so as to reduce load on the remote server
+ * @todo Use special methods for console [ok], [debug], [error] etc
+ * @todo Switch any system.stdOut/stdErr to console.log
+ * @todo Can we reduce reliance on full URLs?
+ * @todo Can we get Orange working without SSL security disabled?
  */
 
 var system = require('system');
@@ -272,8 +278,6 @@ function login(params)
 
 	/**
 	 * Handles all load finished events
-	 * 
-	 * @todo Add in a delay here, so as to reduce load on the remote server
 	 * 
 	 * @param status
 	 */
