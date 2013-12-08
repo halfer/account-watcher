@@ -11,12 +11,12 @@ var params = JSON.parse(jsonString);
 // Check we have the necessary parameters
 if (!params.username)
 {
-	system.stderr.writeLine('This script requires a username');
+	system.stderr.writeLine('[error] This script requires a username');
 	phantom.exit();
 }
 if (!params.password)
 {
-	system.stderr.writeLine('This script requires a password');
+	system.stderr.writeLine('[error] This script requires a password');
 	phantom.exit();
 }
 
@@ -38,6 +38,7 @@ function login(params)
 		this.constants = new Object();
 		this.constants.PAGE_LOGIN = 'login';
 		this.constants.PAGE_EMAIL_REQUEST = 'email';
+		this.constants.PAGE_ACCOUNT_HOME = 'account';
 
 		/**
 		 * Handles the loading of the login screen
@@ -47,16 +48,6 @@ function login(params)
 		 */
 		this.onLoadLogin = function(page, status)
 		{
-			// We get a failure here if we're already logged on, so let's see if we can redirect
-			if (status === 'fail')
-			{
-				console.log('[debug] Receive failure when finding login page, may already be logged on');
-				page.watcherId = 'TryAccountPage';
-				page.open('https://www.youraccount.orange.co.uk/sss/jfn?entry=true');
-
-				return;
-			}
-
 			var pageId = page.evaluate(
 				function(context)
 				{
@@ -67,6 +58,9 @@ function login(params)
 						elementEmail = document.querySelector('.login-flow h2'),
 						titleEmail = elementEmail ? elementEmail.innerText : '',
 
+						elementAccount = document.querySelector('#header h1'),
+						titleAccount = elementAccount ? elementAccount.innerText : '',
+
 						pageId = null
 					;
 
@@ -76,16 +70,22 @@ function login(params)
 						console.log('[ok] Found login screen');
 						pageId = context.constants.PAGE_LOGIN;
 					}
-					// ... or logged in from a previous run
+					// ... or logged in from a previous run, found email request screen...
 					else if (titleEmail.indexOf("We'd like to get to know you better") > -1)
 					{
 						console.log('[ok] Found email request screen, already logged in');
 						pageId = context.constants.PAGE_EMAIL_REQUEST;
 					}
+					// ...or logged in from a previous run and found account home page
+					else if (titleAccount.indexOf('YOUR ACCOUNT') > -1)
+					{
+						console.log('[ok] Found account page, already logged in');
+						pageId = context.constants.PAGE_ACCOUNT_HOME;
+					}
 					else
 					{
-						console.log('[debug] We received something unexpected');
-						pageId = document.querySelector('body').textContent;
+						console.log('[warning] We received something unexpected');
+						pageId = document.querySelector('#header h1').textContent;
 					}
 
 					return pageId;
@@ -109,6 +109,10 @@ function login(params)
 					},
 					page.watcherParams
 				);
+			}
+			else if (pageId === this.constants.PAGE_ACCOUNT_HOME)
+			{
+				console.log('[debug] Found account home page, yippee');
 			}
 		};
 
