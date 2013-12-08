@@ -264,6 +264,12 @@ function login(params)
 		console.log('[debug] URL changed: ' + targetUrl + ' on page: ' + page.watcherId);
 	};
 
+	// Thanks to https://www.princeton.edu/~crmarsh/phantomjs/
+	page.onConsoleMessage = function(msg)
+	{
+		console.log('[remote] Console log: ' + msg);
+	};
+
 	/**
 	 * Handles all load finished events
 	 * 
@@ -284,12 +290,6 @@ function login(params)
 		{
 			console.log('[error] Handler missing for load event: ' + page.watcherId);
 		}
-	};
-
-	// Thanks to https://www.princeton.edu/~crmarsh/phantomjs/
-	page.onConsoleMessage = function(msg)
-	{
-		console.log('Console log: ' + msg);
 	};
 
 	page.watcherId = 'Login';
