@@ -31,7 +31,7 @@ function login(params)
 		this.constants.PAGE_LOGIN = 'Login';
 		this.constants.PAGE_LOGIN_FAILED = 'LoginFailed';
 		this.constants.PAGE_EMAIL_REQUEST = 'Email';
-		this.constants.PAGE_ACCOUNT_HOME = 'Account';
+		this.constants.PAGE_ACCOUNT_HOME = 'AccountHome';
 
 		/**
 		 * Handles the loading of the login screen
@@ -95,6 +95,10 @@ function login(params)
 			else if (pageId === this.constants.PAGE_ACCOUNT_HOME)
 			{
 				console.log('[ok] Found account page, already logged in');
+
+				// Emulates a finished event for the account page
+				page.watcherId = this.constants.PAGE_ACCOUNT_HOME;
+				page.onLoadFinished(status);
 			}
 		};
 
@@ -134,6 +138,8 @@ function login(params)
 					{
 						console.log('[warning] We received something unexpected in onLoadLoginSubmitted');
 					}
+
+					return pageId;
 				},
 				{
 					constants: this.constants
@@ -152,13 +158,13 @@ function login(params)
 
 				// Point to the page we want to load
 				page.watcherId = this.constants.PAGE_ACCOUNT_HOME;
-				//page.open('https://www.youraccount.orange.co.uk/sss/jfn?entry=true&dub=1');
+				page.open('https://www.youraccount.orange.co.uk/sss/jfn?entry=true');
 			}
 		};
 
-		this.onLoadAccount = function(page, status)
+		this.onLoadAccountHome = function(page, status)
 		{
-			
+			console.log('[ok] Woop, now in account home load handler');
 		};
 	}
 
@@ -181,6 +187,13 @@ function login(params)
 		console.log('[debug] New URL: ' + targetUrl + ' on page: ' + page.watcherId);
 	};
 
+	/**
+	 * Handles all load finished events
+	 * 
+	 * @todo Add in a delay here, so as to reduce load on the remote server
+	 * 
+	 * @param status
+	 */
 	page.onLoadFinished = function(status) {
 		console.log('[ok] Page load finished, page: ' + page.watcherId + ', status: ' + status);
 
