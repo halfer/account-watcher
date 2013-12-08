@@ -20,14 +20,6 @@ if (!params.password)
 	phantom.exit();
 }
 
-function containsWarning(haystack, needle)
-{
-	if (haystack.indexOf(needle) === -1)
-	{
-		console.log('[warn] Search string `' + needle + '` not found');
-	}
-}
-
 function login(params)
 {
 	/**
@@ -37,6 +29,7 @@ function login(params)
 	{
 		this.constants = new Object();
 		this.constants.PAGE_LOGIN = 'login';
+		this.constants.PAGE_LOGIN_FAILED = 'login_failed';
 		this.constants.PAGE_EMAIL_REQUEST = 'email';
 		this.constants.PAGE_ACCOUNT_HOME = 'account';
 
@@ -71,6 +64,8 @@ function login(params)
 						pageId = context.constants.PAGE_LOGIN;
 					}
 					// ... or logged in from a previous run, found email request screen...
+					// (note: if we are already in, in fact I think this is not offered again anyway, so
+					// we may be able to delete this bit)
 					else if (titleEmail.indexOf("We'd like to get to know you better") > -1)
 					{
 						console.log('[ok] Found email request screen, already logged in');
@@ -84,8 +79,7 @@ function login(params)
 					}
 					else
 					{
-						console.log('[warning] We received something unexpected');
-						pageId = document.querySelector('#header h1').textContent;
+						console.log('[warning] We received something unexpected in onLoadLogin');
 					}
 
 					return pageId;
@@ -126,33 +120,48 @@ function login(params)
 		 */
 		this.onLoadLoginSubmitted = function(page, status)
 		{
-			page.evaluate(
-				function()
+			var pageId = page.evaluate(
+				function(context)
 				{
-					// Test for wrong credentials
-					var error = document.querySelector('div.inner_left_ee p.error');
-					if (error)
+					var
+						// Test for wrong credentials
+						elementError = document.querySelector('div.inner_left_ee p.error'),
+						textError = elementError ? elementError.innerText : '',
+
+						elementEmail = document.querySelector('.login-flow h2'),
+						titleEmail = elementEmail ? elementEmail.innerText : '',
+
+						pageId = null
+					;
+
+					if (textError.indexOf('Please enter a valid username and password') > -1)
 					{
-						if (error.indexOf('Please enter a valid username and password') !== -1)
-						{
-							console.log(
-								'[error] The username and password settings are incorrect'
-							);
-							phantom.exit();
-						}
+						console.log('[error] The username and password settings are incorrect');
+						pageId = context.constants.PAGE_LOGIN_FAILED;
 					}
+					else if (titleEmail.indexOf("WE'D LIKE TO GET TO KNOW YOU BETTER") > -1)
+					{
+						console.log('[ok] Found email request screen, already logged in');
+						pageId = context.constants.PAGE_EMAIL_REQUEST;
+					}
+					else
+					{
+						console.log('[warning] We received something unexpected in onLoadLoginSubmitted');
+					}
+				},
+				{
+					constants: this.constants
 				}
 			);
 
-			// Test for preferred email address screen, skip if found
-			console.log(
-				page.contents
-			);
-		};
-
-		this.onLoadTryAccountPage = function(page, status)
-		{
-			console.log('Here is the account page, already logged on: ' + status);
+			if (pageId === this.constants.PAGE_LOGIN_FAILED)
+			{
+				phantom.exit();				
+			}
+			else if (pageId === this.constants.PAGE_EMAIL_REQUEST)
+			{
+				// Handle skip to next page here
+			}
 		};
 	}
 
@@ -196,7 +205,3 @@ function login(params)
 login(params);
 
 // @todo If it says "Preferred email address" then go to "https://web.orange.co.uk/id/profilemanagement.php?rm=SkipThisStep"
-// @todo Check it says "hello customer"
-// @todo Inject username into "emailormsisdn"
-// @todo Inject password into "password"
-// @todo Submit via "#SignInForm_EE form button"
