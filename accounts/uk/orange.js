@@ -192,7 +192,7 @@ function login(params)
 		{
 			console.log('[ok] Now in allowance main screen');
 
-			page.evaluate(
+			var data = page.evaluate(
 				function()
 				{
 					var
@@ -205,12 +205,18 @@ function login(params)
 						elementLastUpdated = document.querySelector('#viewRemMinsTextsSummaryForm .bundleUpdated'),
 						textLastUpdated = elementLastUpdated ? elementLastUpdated.innerText : ''
 					;
-					
-					console.log('Balance: ' + textBalance);
-					console.log('Allowance: ' + textAllowance);
-					console.log('Last updated: ' + textLastUpdated);
+
+					return {
+						balance: textBalance,
+						allowance: textAllowance,
+						lastUpdated: textLastUpdated
+					};
 				}
 			);
+
+			console.log('Balance: ' + data.balance);
+			console.log('Allowance: ' + data.allowance);
+			console.log('Last updated: ' + data.lastUpdated);
 
 			// Finally pop over to the usage screen
 			page.watcherId = this.constants.PAGE_USAGE;
@@ -221,16 +227,21 @@ function login(params)
 		{
 			console.log('[ok] Now in data usage screen');
 
-			page.evaluate(
+			var data = page.evaluate(
 				function()
 				{
 					var
 						elementUsage = document.querySelector('#viewUkDataAllowanceForm .dataUsageFont'),
 						textUsage = elementUsage ? elementUsage.innerText : ''
 					;
-					console.log('Usage: ' + textUsage);
+
+					return {
+						usage: textUsage
+					};
 				}
 			);
+
+			console.log('Usage: ' + data.usage);
 		};
 	}
 
