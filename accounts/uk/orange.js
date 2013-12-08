@@ -43,9 +43,20 @@ function login(params)
 		 * Handles the loading of the login screen
 		 * 
 		 * @param page
+		 * @param status
 		 */
-		this.onLoadLogin = function(page)
+		this.onLoadLogin = function(page, status)
 		{
+			// We get a failure here if we're already logged on, so let's see if we can redirect
+			if (status === 'fail')
+			{
+				console.log('[debug] Receive failure when finding login page, may already be logged on');
+				page.watcherId = 'TryAccountPage';
+				page.open('https://www.youraccount.orange.co.uk/sss/jfn?entry=true');
+
+				return;
+			}
+
 			var pageId = page.evaluate(
 				function(context)
 				{
@@ -107,8 +118,9 @@ function login(params)
 		 * If the credentials are wrong this is sometimes called twice
 		 * 
 		 * @param page
+		 * @param status
 		 */
-		this.onLoadLoginSubmitted = function(page)
+		this.onLoadLoginSubmitted = function(page, status)
 		{
 			page.evaluate(
 				function()
@@ -132,7 +144,11 @@ function login(params)
 			console.log(
 				page.contents
 			);
+		};
 
+		this.onLoadTryAccountPage = function(page, status)
+		{
+			console.log('Here is the account page, already logged on: ' + status);
 		};
 	}
 
@@ -155,11 +171,11 @@ function login(params)
 		console.log('[debug] New URL: ' + targetUrl + ' on page: ' + page.watcherId);
 	};
 
-	page.onLoadFinished = function() {
-		console.log('[ok] Page load finished:' + page.watcherId);
+	page.onLoadFinished = function(status) {
+		console.log('[ok] Page load finished, page: ' + page.watcherId + ', status: ' + status);
 
-		// Call the custom handler, passing the page object in
-		loadHandler['onLoad' + page.watcherId](page);
+		// Call the custom handler, passing in interesting params
+		loadHandler['onLoad' + page.watcherId](page, status);
 	};
 
 	// Thanks to https://www.princeton.edu/~crmarsh/phantomjs/
@@ -168,21 +184,9 @@ function login(params)
 		console.log('Console log: ' + msg);
 	};
 
-	var url = 'https://web.orange.co.uk/r/login/';
 	page.watcherId = 'Login';
 	page.watcherParams = params;
-	page.open(
-		url,
-		function(status)
-		{
-			if (status === 'fail')
-			{
-				system.stderr.writeLine("[error] Can't access home page to log on");
-			}
-
-			//phantom.exit();
-		}
-	);
+	page.open('https://web.orange.co.uk/r/login/');
 }
 
 login(params);
