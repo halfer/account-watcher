@@ -30,8 +30,12 @@ function login(params)
 		this.constants = new Object();
 		this.constants.PAGE_LOGIN = 'Login';
 		this.constants.PAGE_LOGIN_FAILED = 'LoginFailed';
+		// This is either the email request or the account home, don't care
+		this.constants.PAGE_LOGIN_SUBMITTED = 'LoginSubmitted';
 		this.constants.PAGE_EMAIL_REQUEST = 'Email';
 		this.constants.PAGE_ACCOUNT_HOME = 'AccountHome';
+		this.constants.PAGE_ALLOWANCE_PREP = 'AllowancePrep';
+		this.constants.PAGE_ALLOWANCE_MAIN = 'AllowanceMain';
 
 		/**
 		 * Handles the loading of the login screen
@@ -80,7 +84,7 @@ function login(params)
 			if (pageId === this.constants.PAGE_LOGIN)
 			{
 				console.log('[ok] Found login screen');
-				page.watcherId = 'LoginSubmitted';
+				page.watcherId = this.constants.PAGE_LOGIN_SUBMITTED;
 				page.evaluate(
 					function(params)
 					{
@@ -154,7 +158,7 @@ function login(params)
 			else if (pageId === this.constants.PAGE_EMAIL_REQUEST)
 			{
 				// Handle skip to next page here
-				console.log('[ok] Found email request screen, already logged in');
+				console.log('[ok] Found email request screen');
 
 				// Point to the page we want to load
 				page.watcherId = this.constants.PAGE_ACCOUNT_HOME;
@@ -164,7 +168,52 @@ function login(params)
 
 		this.onLoadAccountHome = function(page, status)
 		{
-			console.log('[ok] Woop, now in account home load handler');
+			console.log('[ok] Now in account home screen');
+
+			// This will cause a redirect, and we're interested in the second one (the first one says "processing")
+			page.watcherId = this.constants.PAGE_ALLOWANCE_PREP;
+			page.open('https://www.youraccount.orange.co.uk/sss/jfn?mfunc=877&cem=RMN0002_ViewRemMinAndText&jfnRC=1');
+		};
+
+		/**
+		 * This renders a "processing" screen on the remote side, and redirects after a few seconds
+		 * 
+		 * @param page
+		 * @param status
+		 */
+		this.onLoadAllowancePrep = function(page, status)
+		{
+			console.log('[ok] Now in allowance preparation screen');
+			page.watcherId = this.constants.PAGE_ALLOWANCE_MAIN;
+		};
+
+		this.onLoadAllowanceMain = function(page, status)
+		{
+			console.log('[ok] Now in allowance main screen');
+
+			page.evaluate(
+				function()
+				{
+					var
+						elementBalance = document.querySelector('#paymBalanceIncVAT'),
+						textBalance = elementBalance ? elementBalance.innerText : '',
+
+						elementUsage = document.querySelector('.bundleSummary .status'),
+						textUsage = elementUsage ? elementUsage.innerText : ''
+				
+						// @todo Grab .bundleUpdated time as well
+					;
+					
+					console.log('Balance: ' + textBalance);
+					console.log('Usage: ' + textUsage);
+				}
+			);
+
+		};
+
+		this.onLoadDataUsage = function(page, status)
+		{
+			// https://www.youraccount.orange.co.uk/sss/jfn?mfunc=1559
 		};
 	}
 
@@ -184,7 +233,7 @@ function login(params)
 	 * @param targetUrl
 	 */
 	page.onUrlChanged = function(targetUrl) {
-		console.log('[debug] New URL: ' + targetUrl + ' on page: ' + page.watcherId);
+		console.log('[debug] URL changed: ' + targetUrl + ' on page: ' + page.watcherId);
 	};
 
 	/**
