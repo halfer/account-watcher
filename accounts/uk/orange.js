@@ -28,10 +28,10 @@ function login(params)
 	function LoadHandler()
 	{
 		this.constants = new Object();
-		this.constants.PAGE_LOGIN = 'login';
-		this.constants.PAGE_LOGIN_FAILED = 'login_failed';
-		this.constants.PAGE_EMAIL_REQUEST = 'email';
-		this.constants.PAGE_ACCOUNT_HOME = 'account';
+		this.constants.PAGE_LOGIN = 'Login';
+		this.constants.PAGE_LOGIN_FAILED = 'LoginFailed';
+		this.constants.PAGE_EMAIL_REQUEST = 'Email';
+		this.constants.PAGE_ACCOUNT_HOME = 'Account';
 
 		/**
 		 * Handles the loading of the login screen
@@ -147,9 +147,18 @@ function login(params)
 			}
 			else if (pageId === this.constants.PAGE_EMAIL_REQUEST)
 			{
-				console.log('[ok] Found email request screen, already logged in');
 				// Handle skip to next page here
+				console.log('[ok] Found email request screen, already logged in');
+
+				// Point to the page we want to load
+				page.watcherId = this.constants.PAGE_ACCOUNT_HOME;
+				//page.open('https://www.youraccount.orange.co.uk/sss/jfn?entry=true&dub=1');
 			}
+		};
+
+		this.onLoadAccount = function(page, status)
+		{
+			
 		};
 	}
 
@@ -176,7 +185,15 @@ function login(params)
 		console.log('[ok] Page load finished, page: ' + page.watcherId + ', status: ' + status);
 
 		// Call the custom handler, passing in interesting params
-		loadHandler['onLoad' + page.watcherId](page, status);
+		var method = loadHandler['onLoad' + page.watcherId];
+		if (typeof method === 'function')
+		{
+			method.call(page.watcherHandler, page, status);
+		}
+		else
+		{
+			console.log('[error] Handler missing for load event: ' + page.watcherId);
+		}
 	};
 
 	// Thanks to https://www.princeton.edu/~crmarsh/phantomjs/
@@ -187,9 +204,8 @@ function login(params)
 
 	page.watcherId = 'Login';
 	page.watcherParams = params;
+	page.watcherHandler = loadHandler;
 	page.open('https://web.orange.co.uk/r/login/');
 }
 
 login(params);
-
-// @todo If it says "Preferred email address" then go to "https://web.orange.co.uk/id/profilemanagement.php?rm=SkipThisStep"
