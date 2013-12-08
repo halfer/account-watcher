@@ -1,0 +1,11 @@
+; Account details go here
+
+; The country is the first-level folder in the "accounts" folder
+country = uk
+
+; The provider is the name of the script in the country folder, minus the ".js" suffix
+provider = orange
+
+; These are user-specific
+username = _username_
+password = _password_
