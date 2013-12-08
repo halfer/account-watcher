@@ -36,6 +36,7 @@ function login(params)
 		this.constants.PAGE_ACCOUNT_HOME = 'AccountHome';
 		this.constants.PAGE_ALLOWANCE_PREP = 'AllowancePrep';
 		this.constants.PAGE_ALLOWANCE_MAIN = 'AllowanceMain';
+		this.constants.PAGE_USAGE = 'Usage';
 
 		/**
 		 * Handles the loading of the login screen
@@ -211,11 +212,25 @@ function login(params)
 				}
 			);
 
+			// Finally pop over to the usage screen
+			page.watcherId = this.constants.PAGE_USAGE;
+			page.open('https://www.youraccount.orange.co.uk/sss/jfn?mfunc=1559&jfnRC=6');
 		};
 
-		this.onLoadDataUsage = function(page, status)
+		this.onLoadUsage = function(page, status)
 		{
-			// https://www.youraccount.orange.co.uk/sss/jfn?mfunc=1559
+			console.log('[ok] Now in data usage screen');
+
+			page.evaluate(
+				function()
+				{
+					var
+						elementUsage = document.querySelector('#viewUkDataAllowanceForm .dataUsageFont'),
+						textUsage = elementUsage ? elementUsage.innerText : ''
+					;
+					console.log('Usage: ' + textUsage);
+				}
+			);
 		};
 	}
 
