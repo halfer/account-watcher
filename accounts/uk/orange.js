@@ -295,7 +295,7 @@ function login(params)
 		}
 	};
 
-	page.watcherId = 'Login';
+	page.watcherId = loadHandler.constants.PAGE_LOGIN;
 	page.watcherParams = params;
 	page.watcherHandler = loadHandler;
 	page.open('https://web.orange.co.uk/r/login/');
