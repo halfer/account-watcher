@@ -198,14 +198,16 @@ function login(params)
 						elementBalance = document.querySelector('#paymBalanceIncVAT'),
 						textBalance = elementBalance ? elementBalance.innerText : '',
 
-						elementUsage = document.querySelector('.bundleSummary .status'),
-						textUsage = elementUsage ? elementUsage.innerText : ''
-				
-						// @todo Grab .bundleUpdated time as well
+						elementAllowance = document.querySelector('.bundleSummary .status'),
+						textAllowance = elementAllowance ? elementAllowance.innerText : '',
+
+						elementLastUpdated = document.querySelector('#viewRemMinsTextsSummaryForm .bundleUpdated'),
+						textLastUpdated = elementLastUpdated ? elementLastUpdated.innerText : ''
 					;
 					
 					console.log('Balance: ' + textBalance);
-					console.log('Usage: ' + textUsage);
+					console.log('Allowance: ' + textAllowance);
+					console.log('Last updated: ' + textLastUpdated);
 				}
 			);
 
