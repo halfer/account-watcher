@@ -35,15 +35,9 @@ function login(params)
 	 */
 	function LoadHandler()
 	{
-		this.PAGE_LOGIN = 'login';
-		this.PAGE_EMAIL_REQUEST = 'email';
-		//this.PAGE_ACCOUNT = 'account';
-
-//		function webTestForEmailRequestPage()
-//		{
-//			var title = document.querySelector('.login-flow h2');
-//			console('Check title: ' + title.innerText);
-//		}
+		this.constants = new Object();
+		this.constants.PAGE_LOGIN = 'login';
+		this.constants.PAGE_EMAIL_REQUEST = 'email';
 
 		/**
 		 * Handles the loading of the login screen
@@ -52,42 +46,59 @@ function login(params)
 		 */
 		this.onLoadLogin = function(page)
 		{
-			var title = page.evaluate(
-				function(params)
+			var pageId = page.evaluate(
+				function(context)
 				{
-					var element = document.querySelector('h1.PageTitleSignInEE');
-					var title = element ? element.innerText : '';
+					var
+						elementLoggedOut = document.querySelector('h1.PageTitleSignInEE'),
+						titleLoggedOut = elementLoggedOut ? elementLoggedOut.innerText : '',
 
-					// WIP
-					/*
-					if (title.indexOf('SERVICES ON ORANGE.CO.UK') > -1)
+						elementEmail = document.querySelector('.login-flow h2'),
+						titleEmail = elementEmail ? elementEmail.innerText : '',
+
+						pageId = null
+					;
+
+					// Determine whether we are logged out...
+					if (titleLoggedOut.indexOf('SERVICES ON ORANGE.CO.UK') > -1)
 					{
-						// Return login status
+						console.log('[ok] Found login screen');
+						pageId = context.constants.PAGE_LOGIN;
 					}
-					*/
+					// ... or logged in from a previous run
+					else if (titleEmail.indexOf("We'd like to get to know you better") > -1)
+					{
+						console.log('[ok] Found email request screen, already logged in');
+						pageId = context.constants.PAGE_EMAIL_REQUEST;
+					}
+					else
+					{
+						console.log('[debug] We received something unexpected');
+						pageId = document.querySelector('body').textContent;
+					}
 
-					return title;
+					return pageId;
 				},
-				page.watcherParams
-			);
-
-			// @todo If our cookie means we are already logged in, skip this bit
-			console.log('Contents: ' + page.contents);
-			phantom.exit();
-
-			containsWarning(title, 'SERVICES ON ORANGE.CO.UK');
-
-			page.watcherId = 'LoginSubmitted';
-			page.evaluate(
-				function(params)
 				{
-					// Set up the credentials and submit the form
-					document.querySelector('input[name=LOGIN]').value = params.username;
-					document.querySelector('input[name=PASSWORD]').value = params.password;
-					document.querySelector('div.inner_left_ee form').submit();
-				},
-				page.watcherParams
+					constants: this.constants
+				}
 			);
+
+			// Only make an attempt to log on if this is the login page
+			if (pageId === this.constants.PAGE_LOGIN)
+			{
+				page.watcherId = 'LoginSubmitted';
+				page.evaluate(
+					function(params)
+					{
+						// Set up the credentials and submit the form
+						document.querySelector('input[name=LOGIN]').value = params.username;
+						document.querySelector('input[name=PASSWORD]').value = params.password;
+						document.querySelector('div.inner_left_ee form').submit();
+					},
+					page.watcherParams
+				);
+			}
 		};
 
 		/**
@@ -168,21 +179,8 @@ function login(params)
 			{
 				system.stderr.writeLine("[error] Can't access home page to log on");
 			}
-			else
-			{
-				// We need to run this on the +next+ page load
-//				page.evaluate(
-//					function()
-//					{
-//						var title = document.querySelector('.login-flow h2');
-//						console('Check title: ' + title.innerText);
-//					}
-//				);
 
-//				page.close();
-			}
-
-//			phantom.exit();
+			//phantom.exit();
 		}
 	);
 }
