@@ -57,13 +57,11 @@ function login(params)
 					// Determine whether we are logged out...
 					if (titleLoggedOut.indexOf('SERVICES ON ORANGE.CO.UK') > -1)
 					{
-						console.log('[ok] Found login screen');
 						pageId = context.constants.PAGE_LOGIN;
 					}
 					// ...or logged in from a previous run and found account home page
 					else if (titleAccount.indexOf('YOUR ACCOUNT') > -1)
 					{
-						console.log('[ok] Found account page, already logged in');
 						pageId = context.constants.PAGE_ACCOUNT_HOME;
 					}
 					else
@@ -81,6 +79,7 @@ function login(params)
 			// Only make an attempt to log on if this is the login page
 			if (pageId === this.constants.PAGE_LOGIN)
 			{
+				console.log('[ok] Found login screen');
 				page.watcherId = 'LoginSubmitted';
 				page.evaluate(
 					function(params)
@@ -95,7 +94,7 @@ function login(params)
 			}
 			else if (pageId === this.constants.PAGE_ACCOUNT_HOME)
 			{
-				console.log('[debug] Found account home page, yippee');
+				console.log('[ok] Found account page, already logged in');
 			}
 		};
 
@@ -125,12 +124,10 @@ function login(params)
 
 					if (textError.indexOf('Please enter a valid username and password') > -1)
 					{
-						console.log('[error] The username and password settings are incorrect');
 						pageId = context.constants.PAGE_LOGIN_FAILED;
 					}
 					else if (titleEmail.indexOf("WE'D LIKE TO GET TO KNOW YOU BETTER") > -1)
 					{
-						console.log('[ok] Found email request screen, already logged in');
 						pageId = context.constants.PAGE_EMAIL_REQUEST;
 					}
 					else
@@ -145,10 +142,12 @@ function login(params)
 
 			if (pageId === this.constants.PAGE_LOGIN_FAILED)
 			{
+				console.log('[error] The username and password settings are incorrect');
 				phantom.exit();				
 			}
 			else if (pageId === this.constants.PAGE_EMAIL_REQUEST)
 			{
+				console.log('[ok] Found email request screen, already logged in');
 				// Handle skip to next page here
 			}
 		};
