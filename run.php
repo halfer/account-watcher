@@ -20,8 +20,14 @@ $line =  escapeshellarg(json_encode($args));
 $options = array(
 	'--load-images=false',
 	'--cookies-file=cookies.txt',
-	'--ignore-ssl-errors=true', // @todo This seems to be necessary on main account home
 );
+
+// Add in SSL config
+if ($configData['ignore_ssl_errors'])
+{
+	$options[] = '--ignore-ssl-errors=true';
+}
+
 $optionsLine = implode(' ', $options);
 
 // Run command
