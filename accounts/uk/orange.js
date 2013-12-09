@@ -109,10 +109,6 @@ LoadHandler.prototype.onLoadLogin = function(page, status)
 			{
 				pageId = context.constants.PAGE_ACCOUNT_HOME;
 			}
-			else
-			{
-				this.outputWarning('We received something unexpected in onLoadLogin');
-			}
 
 			return pageId;
 		},
@@ -144,6 +140,10 @@ LoadHandler.prototype.onLoadLogin = function(page, status)
 		// Emulates a finished event for the account page
 		page.watcherId = this.constants.PAGE_ACCOUNT_HOME;
 		page.onLoadFinished(status);
+	}
+	else
+	{
+		this.outputWarning('We received something unexpected in onLoadLogin');
 	}
 };
 
@@ -179,10 +179,6 @@ LoadHandler.prototype.onLoadLoginSubmitted = function(page, status)
 			{
 				pageId = context.constants.PAGE_EMAIL_REQUEST;
 			}
-			else
-			{
-				this.outputWarning('We received something unexpected in onLoadLoginSubmitted');
-			}
 
 			return pageId;
 		},
@@ -204,6 +200,10 @@ LoadHandler.prototype.onLoadLoginSubmitted = function(page, status)
 		// Point to the page we want to load
 		page.watcherId = this.constants.PAGE_ACCOUNT_HOME;
 		page.open('https://www.youraccount.orange.co.uk/sss/jfn?entry=true');
+	}
+	else
+	{
+		this.outputWarning('We received something unexpected in onLoadLoginSubmitted');
 	}
 };
 
