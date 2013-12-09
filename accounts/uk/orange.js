@@ -219,9 +219,8 @@ function login(params)
 				}
 			);
 
-			console.log('Balance: ' + data.balance);
-			console.log('Allowance: ' + data.allowance);
-			console.log('Last updated: ' + data.lastUpdated);
+			// Output the data
+			console.log('[data] ' + JSON.stringify(data));
 
 			// Finally pop over to the usage screen
 			page.watcherId = this.constants.PAGE_USAGE;
@@ -246,7 +245,8 @@ function login(params)
 				}
 			);
 
-			console.log('Usage: ' + data.usage);
+			// Output the data
+			console.log('[data] ' + JSON.stringify(data));
 		};
 	}
 
