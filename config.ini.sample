@@ -1,10 +1,19 @@
-; Account details go here
+; ****
+; Configuration ini file for Account Watcher
+;
+; Copy this file (config.ini.sample) as config.ini and save it in the same folder. Then,
+; complete the details for your provider (if it is supported) and your username and
+; password.
+; ****
 
 ; The country is the first-level folder in the "accounts" folder
 country = uk
 
 ; The provider is the name of the script in the country folder, minus the ".js" suffix
 provider = orange
+
+; Needed with some SSL configurations
+ignore_ssl_errors = false
 
 ; These are user-specific
 username = _username_
