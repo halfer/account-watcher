@@ -1,8 +1,9 @@
 /* 
  * Script to obtain useful information from an Orange Your Account login in the UK.
  * 
+ * @todo Does from-scratch script now have problems?
+ * @todo Move non-OO code into separate method
  * @todo Use regexps to seperate data out into parsable numbers
- * @todo Use special methods for console [ok], [debug], [error] etc
  * @todo Can we reduce reliance on full URLs?
  * @todo Can we get Orange working without SSL security disabled?
  */
