@@ -1,7 +1,7 @@
 /* 
  * Script to obtain useful information from an Orange Your Account login in the UK.
  * 
- * @todo Add delay to loaded handler, so as to reduce load on the remote server
+ * @todo Use regexps to seperate data out into parsable numbers
  * @todo Use special methods for console [ok], [debug], [error] etc
  * @todo Can we reduce reliance on full URLs?
  * @todo Can we get Orange working without SSL security disabled?
@@ -287,7 +287,14 @@ function login(params)
 		var method = loadHandler['onLoad' + page.watcherId];
 		if (typeof method === 'function')
 		{
-			method.call(page.watcherHandler, page, status);
+			// Put in a small delay, so the server can breathe!
+			setTimeout(
+				function()
+				{
+					method.call(page.watcherHandler, page, status);
+				},
+				1500
+			);
 		}
 		else
 		{
