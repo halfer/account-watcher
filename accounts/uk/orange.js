@@ -283,6 +283,9 @@ LoadHandler.prototype.onLoadUsage = function(page, status)
 
 	// Output the data
 	this.outputData(JSON.stringify(data));
+
+	// Exit before the log-out thingy reloads the page
+	phantom.exit();
 };
 
 function login(params)
