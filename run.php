@@ -7,7 +7,7 @@ $configFile = $root . '/config.ini';
 $configData = parse_ini_file($configFile);
 
 // Work out script location
-$script = $root . '/accounts/' . $configData['country'] . '/' . $configData['provider'] . '.js';
+$script = $root . '/accounts/' . $configData['country'] . '/' . $configData['provider'] . '/main.js';
 
 // Set up the parameters string in JSON
 $args = array(
