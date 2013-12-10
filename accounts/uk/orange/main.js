@@ -131,7 +131,11 @@ LoadHandler.prototype.onLoadLoginSubmitted = function(page, status)
 			{
 				pageId = context.constants.PAGE_LOGIN_FAILED;
 			}
-			else if (titleEmail.indexOf("WE'D LIKE TO GET TO KNOW YOU BETTER") > -1)
+			else if (
+				// Noticed the "help" version on 10 Dec 2013
+				(titleEmail.indexOf("WE'D LIKE TO GET TO KNOW YOU BETTER") > -1) ||
+				(titleEmail.indexOf("WE'D LIKE TO HELP YOU BETTER") > -1)
+			)
 			{
 				pageId = context.constants.PAGE_EMAIL_REQUEST;
 			}
