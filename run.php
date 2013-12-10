@@ -3,7 +3,7 @@
 $root = realpath(dirname(__FILE__));
 
 // Load the configuration
-$configFile = $root . '/config.ini';
+$configFile = $root . '/configs/account.ini';
 $configData = parse_ini_file($configFile);
 
 // Work out script location
