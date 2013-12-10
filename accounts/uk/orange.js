@@ -225,6 +225,29 @@ LoadHandler.prototype.onLoadAccountHome = function(page, status)
  */
 LoadHandler.prototype.onLoadAllowancePrep = function(page, status)
 {
+	// @todo Maybe disable this, in favour of onUrlChangedAllowancePrep?
+	this.switchToMainAllowanceScreen(page);
+};
+
+/**
+ * Alternative and possibly better version of onLoadAllowancePrep
+ * 
+ * Note: occasionally "onLoadAllowancePrep" is called too late, and so doesn't reset the watcherId in time
+ * for the second onload event (for the main rather than the prep screen). I'm trying this one
+ * +additionally+, but it may be better to use it instead.
+ * 
+ * @param page
+ * @param targetUrl
+ */
+LoadHandler.prototype.onUrlChangedAllowancePrep = function(page, targetUrl) {
+	if (targetUrl.indexOf('jfnRC=2') > -1)
+	{
+		this.switchToMainAllowanceScreen(page);
+	}
+};
+
+LoadHandler.prototype.switchToMainAllowanceScreen = function(page)
+{
 	this.outputInfo('Now in allowance preparation screen');
 	page.watcherId = this.constants.PAGE_ALLOWANCE_MAIN;
 };
@@ -307,6 +330,13 @@ function login(params)
 	 */
 	page.onUrlChanged = function(targetUrl) {
 		page.watcherHandler.outputDebug('URL changed: ' + targetUrl + ' on page: ' + page.watcherId);
+
+		// Call the custom handler, passing in interesting params
+		var method = loadHandler['onUrlChanged' + page.watcherId];
+		if (typeof method === 'function')
+		{
+			method.call(page.watcherHandler, page, targetUrl);
+		}
 	};
 
 	// Thanks to https://www.princeton.edu/~crmarsh/phantomjs/
