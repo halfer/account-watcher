@@ -86,7 +86,7 @@ LoadHandler.prototype.onLoadLogin = function(page, status)
 				document.querySelector('input[name=PASSWORD]').value = params.password;
 				document.querySelector('div.inner_left_ee form').submit();
 			},
-			page.watcherParams
+			page.watcherHandler.params
 		);
 	}
 	else if (pageId === this.constants.PAGE_ACCOUNT_HOME)
@@ -360,7 +360,6 @@ function login()
 	};
 
 	page.watcherId = loadHandler.constants.PAGE_LOGIN;
-	page.watcherParams = loadHandler.params; // @todo Use page.watcherHandler.params instead
 	page.watcherHandler = loadHandler;
 	page.open('https://web.orange.co.uk/r/login/');
 }
