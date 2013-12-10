@@ -25,39 +25,13 @@ if (!params.password)
 	phantom.exit();
 }
 
-function LoadHandlerBase()
+// Load base object using relative path
+var ok = phantom.injectJs('../../../scripts/LoadHandlerBase.js');
+if (!ok)
 {
+	console.log('Failed to load JS assets');
+	phantom.exit();
 }
-
-LoadHandlerBase.prototype.outputInfo = function(msg)
-{
-	console.log('[info] ' + msg);
-};
-
-LoadHandlerBase.prototype.outputDebug = function(msg)
-{
-	console.log('[debug] ' + msg);
-};
-
-LoadHandlerBase.prototype.outputData = function(msg)
-{
-	console.log('[data] ' + msg);		
-};
-
-LoadHandlerBase.prototype.outputError = function(msg)
-{
-	console.log('[error] ' + msg);		
-};
-
-LoadHandlerBase.prototype.outputWarning = function(msg)
-{
-	console.log('[warning] ' + msg);		
-};
-
-LoadHandlerBase.prototype.outputRemote = function(msg)
-{
-	console.log('[remote] ' + msg);		
-};
 
 LoadHandler.prototype = new LoadHandlerBase();
 
