@@ -4,26 +4,8 @@
  * @todo Does from-scratch script now have problems?
  * @todo Move non-OO code into separate method
  * @todo Can we reduce reliance on full URLs?
- * @todo Can we get Orange working without SSL security disabled?
+ * @todo Can we get Orange working without SSL security disabled? (maybe get a repo of latest certs?)
  */
-
-var system = require('system');
-
-// Get the parameters from the launch script
-var jsonString = system.args[1];
-var params = JSON.parse(jsonString);
-
-// Check we have the necessary parameters
-if (!params.username)
-{
-	console.log('[error] This script requires a username');
-	phantom.exit();
-}
-if (!params.password)
-{
-	console.log('[error] This script requires a password');
-	phantom.exit();
-}
 
 // Load base object using relative path
 var ok = phantom.injectJs('../../../scripts/LoadHandlerBase.js');
@@ -304,13 +286,15 @@ LoadHandler.prototype.onLoadUsage = function(page, status)
 	phantom.exit();
 };
 
-function login(params)
+function login()
 {
 	// Logon to the system
 	var
 		page = require('webpage').create(),
 		loadHandler = new LoadHandler()
 	;
+
+	loadHandler.standardParamChecks();
 
 	page.onLoadStarted = function() {
 		page.watcherHandler.outputInfo('Page load started: ' + page.watcherId);
@@ -366,9 +350,9 @@ function login(params)
 	};
 
 	page.watcherId = loadHandler.constants.PAGE_LOGIN;
-	page.watcherParams = params;
+	page.watcherParams = loadHandler.params; // @todo Use page.watcherHandler.params instead
 	page.watcherHandler = loadHandler;
 	page.open('https://web.orange.co.uk/r/login/');
 }
 
-login(params);
+login();
