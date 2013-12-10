@@ -2,6 +2,7 @@
  * Script to obtain useful information from an Orange Your Account login in the UK.
  * 
  * @todo Does from-scratch script now have problems?
+ * @todo Configure each debug/info/data/etc type in a CSV list
  * @todo Move non-OO code into separate method
  * @todo Can we reduce reliance on full URLs?
  * @todo Can we get Orange working without SSL security disabled? (maybe get a repo of latest certs?)
@@ -299,69 +300,7 @@ function login()
 	;
 
 	loadHandler.standardParamChecks();
-
-	// All these handlers can be moved to the parent, yay
-	page.onLoadStarted = function() {
-		page.watcherHandler.outputInfo('Page load started: ' + page.watcherId);
-	};
-
-	/**
-	 * This is called, I think, when a redirect happens
-	 * 
-	 * @param targetUrl
-	 */
-	page.onUrlChanged = function(targetUrl) {
-		page.watcherHandler.outputDebug('URL changed: ' + targetUrl + ' on page: ' + page.watcherId);
-
-		// Call the custom handler, passing in interesting params
-		var method = loadHandler['onUrlChanged' + page.watcherId];
-		if (typeof method === 'function')
-		{
-			method.call(page.watcherHandler, page, targetUrl);
-		}
-	};
-
-	/**
-	 * Called when we/remote site writes to console in remote context
-	 * 
-	 * Thanks to https://www.princeton.edu/~crmarsh/phantomjs/
-	 * 
-	 * @param msg
-	 */
-	page.onConsoleMessage = function(msg)
-	{
-		if (page.watcherHandler.params.echoRemote)
-		{
-			page.watcherHandler.outputRemote('Console log: ' + msg);
-		}
-	};
-
-	/**
-	 * Handles all load finished events
-	 * 
-	 * @param status
-	 */
-	page.onLoadFinished = function(status) {
-		page.watcherHandler.outputInfo('Page load finished, page: ' + page.watcherId + ', status: ' + status);
-
-		// Call the custom handler, passing in interesting params
-		var method = loadHandler['onLoad' + page.watcherId];
-		if (typeof method === 'function')
-		{
-			// Put in a small delay, so the server can breathe!
-			setTimeout(
-				function()
-				{
-					method.call(page.watcherHandler, page, status);
-				},
-				1500
-			);
-		}
-		else
-		{
-			page.watcherHandler.outputError('Handler missing for load event: ' + page.watcherId);
-		}
-	};
+	loadHandler.configureAllStandardHandlers(page);
 
 	page.watcherId = loadHandler.constants.PAGE_LOGIN;
 	page.watcherHandler = loadHandler;

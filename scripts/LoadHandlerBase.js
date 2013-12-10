@@ -1,5 +1,7 @@
 function LoadHandlerBase()
 {
+	// We'll load this in a bit
+	this.params = {};
 }
 
 LoadHandlerBase.prototype.outputInfo = function(msg)
@@ -32,7 +34,11 @@ LoadHandlerBase.prototype.outputRemote = function(msg)
 	console.log('[remote] ' + msg);		
 };
 
-// @todo Split this into loading params and checking them
+/**
+ * Loads the parameters and does some basic checks
+ * 
+ * @todo Split this into loading params and checking them
+ */
 LoadHandlerBase.prototype.standardParamChecks = function()
 {
 	var system = require('system');
@@ -54,4 +60,122 @@ LoadHandlerBase.prototype.standardParamChecks = function()
 	}
 
 	this.params = params;
+};
+
+/**
+ * Sets up the standard LoadStarted page event handler
+ * 
+ * This can be overridden in the child if required
+ * 
+ * @param page
+ */
+LoadHandlerBase.prototype.configureOnLoadStarted = function(page)
+{
+	/**
+	 * This is called when a load has started
+	 */
+	page.onLoadStarted = function() {
+		page.watcherHandler.outputInfo('Page load started: ' + page.watcherId);
+	};
+};
+
+/**
+ * Sets up the standard UrlChanged page event handler
+ * 
+ * This can be overridden in the child if required
+ * 
+ * @param page
+ */
+LoadHandlerBase.prototype.configureOnUrlChanged = function(page)
+{
+	/**
+	 * This is called, I think, when a redirect happens
+	 * 
+	 * @param targetUrl
+	 */
+	page.onUrlChanged = function(targetUrl) {
+		page.watcherHandler.outputDebug('URL changed: ' + targetUrl + ' on page: ' + page.watcherId);
+
+		// Call the custom handler, passing in interesting params
+		var method = page.watcherHandler['onUrlChanged' + page.watcherId];
+		if (typeof method === 'function')
+		{
+			method.call(page.watcherHandler, page, targetUrl);
+		}
+	};
+};
+
+/**
+ * Sets up the standard ConsoleMessage page handler
+ * 
+ * This can be overridden in the child if required
+ * 
+ * @param page
+ */
+LoadHandlerBase.prototype.configureOnConsoleMessage = function(page)
+{
+	/**
+	 * Called when we/remote site writes to console in remote context
+	 * 
+	 * Thanks to https://www.princeton.edu/~crmarsh/phantomjs/
+	 * 
+	 * @param msg
+	 */
+	page.onConsoleMessage = function(msg)
+	{
+		if (page.watcherHandler.params.echoRemote)
+		{
+			page.watcherHandler.outputRemote('Console log: ' + msg);
+		}
+	};
+};
+
+/**
+ * Sets up the standard LoadFinished page handler
+ * 
+ * This can be overridden in the child if required
+ * 
+ * @param page
+ */
+LoadHandlerBase.prototype.configureOnLoadFinished = function(page)
+{
+	/**
+	 * Handles all load finished events
+	 * 
+	 * @param status
+	 */
+	page.onLoadFinished = function(status) {
+		page.watcherHandler.outputInfo('Page load finished, page: ' + page.watcherId + ', status: ' + status);
+
+		// Call the custom handler, passing in interesting params
+		var method = page.watcherHandler['onLoad' + page.watcherId];
+		if (typeof method === 'function')
+		{
+			// Put in a small delay, so the server can breathe!
+			setTimeout(
+				function()
+				{
+					method.call(page.watcherHandler, page, status);
+				},
+				1500
+			);
+		}
+		else
+		{
+			page.watcherHandler.outputError('Handler missing for load event: ' + page.watcherId);
+		}
+	};
+};
+
+/**
+ * Sets up all standard event handlers
+ * 
+ * @param page
+ */
+LoadHandlerBase.prototype.configureAllStandardHandlers = function(page)
+{
+	this.configureOnLoadStarted(page);
+	this.configureOnUrlChanged(page);
+	this.configureOnConsoleMessage(page);
+	this.configureOnLoadFinished(page);
 };
