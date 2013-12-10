@@ -3,7 +3,6 @@
  * 
  * @todo Does from-scratch script now have problems?
  * @todo Move non-OO code into separate method
- * @todo Use regexps to seperate data out into parsable numbers
  * @todo Can we reduce reliance on full URLs?
  * @todo Can we get Orange working without SSL security disabled?
  */
@@ -267,13 +266,27 @@ LoadHandler.prototype.onLoadAllowanceMain = function(page, status)
 				textAllowance = elementAllowance ? elementAllowance.innerText : '',
 
 				elementLastUpdated = document.querySelector('#viewRemMinsTextsSummaryForm .bundleUpdated'),
-				textLastUpdated = elementLastUpdated ? elementLastUpdated.innerText : ''
+				textLastUpdated = elementLastUpdated ? elementLastUpdated.innerText : '',
+
+				// Split up format: "123.45 MB used, 6789.01 MB remaining"
+				patternAllowance = /((?:\d+.?\d*) (?:MB|GB)) used, ((?:\d+.?\d*) (?:MB|GB)) remaining/,
+				matchesAllowance = textAllowance.match(patternAllowance),
+				textAllowanceUsed = matchesAllowance[1],
+				textAllowanceRemaining = matchesAllowance[2],
+
+				// Split up format: "Last updated: 12:43 09/12/13"
+				patternDate = /Last updated: ([\d\/\s:]+)/,
+				matchesDate = textLastUpdated.match(patternDate),
+				lastUpdated = matchesDate[1]
 			;
 
 			return {
 				balance: textBalance,
-				allowance: textAllowance,
-				lastUpdated: textLastUpdated
+				allowanceText: textAllowance,
+				allowanceUsed: textAllowanceUsed,
+				allowanceRemaining: textAllowanceRemaining,
+				lastUpdatedText: textLastUpdated,
+				lastUpdated: lastUpdated
 			};
 		}
 	);
@@ -295,11 +308,17 @@ LoadHandler.prototype.onLoadUsage = function(page, status)
 		{
 			var
 				elementUsage = document.querySelector('#viewUkDataAllowanceForm .dataUsageFont'),
-				textUsage = elementUsage ? elementUsage.innerText : ''
+				textUsage = elementUsage ? elementUsage.innerText : '',
+
+				// Split up format "You've used a total of 11.73GB of data"
+				patternUsage = /You've used a total of ((?:\d+.?\d*)\s*(?:MB|GB)) of data/,
+				matchesUsage = textUsage.match(patternUsage),
+				usageTotal = matchesUsage[1]
 			;
 
 			return {
-				usage: textUsage
+				usageText: textUsage,
+				usageTotal: usageTotal
 			};
 		}
 	);
