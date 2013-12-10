@@ -1,0 +1,4 @@
+; System config goes here
+
+; This can just be "phantomjs" if it's in the sys path, or a fully-qualified filename
+phantom_executable = phantomjs

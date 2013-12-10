@@ -2,7 +2,12 @@
 
 $root = realpath(dirname(__FILE__));
 
-// Load the configuration
+// Load the system configuration
+$sysConfigFile = $root . '/configs/system.ini';
+$sysConfigData = parse_ini_file($sysConfigFile);
+$executable = $sysConfigData['phantom_executable'];
+
+// Load the account configuration
 $configFile = $root . '/configs/account.ini';
 $configData = parse_ini_file($configFile);
 
@@ -31,5 +36,5 @@ if ($configData['ignore_ssl_errors'])
 $optionsLine = implode(' ', $options);
 
 // Run command
-$cmd = $root . '/phantomjs/bin/phantomjs ' . $optionsLine . ' ' . $script . ' ' . $line;
+$cmd = $executable . ' ' . $optionsLine . ' ' . $script . ' ' . $line;
 system($cmd);
