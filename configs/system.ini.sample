@@ -2,3 +2,6 @@
 
 ; This can just be "phantomjs" if it's in the sys path, or a fully-qualified filename
 phantom_executable = phantomjs
+
+; Decide whether to output remote console logs
+echo_remote_console = false

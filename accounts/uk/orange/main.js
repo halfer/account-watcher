@@ -296,6 +296,7 @@ function login()
 
 	loadHandler.standardParamChecks();
 
+	// All these handlers can be moved to the parent, yay
 	page.onLoadStarted = function() {
 		page.watcherHandler.outputInfo('Page load started: ' + page.watcherId);
 	};
@@ -316,10 +317,19 @@ function login()
 		}
 	};
 
-	// Thanks to https://www.princeton.edu/~crmarsh/phantomjs/
+	/**
+	 * Called when we/remote site writes to console in remote context
+	 * 
+	 * Thanks to https://www.princeton.edu/~crmarsh/phantomjs/
+	 * 
+	 * @param msg
+	 */
 	page.onConsoleMessage = function(msg)
 	{
-		page.watcherHandler.outputRemote('Console log: ' + msg);
+		if (page.watcherHandler.params.echoRemote)
+		{
+			page.watcherHandler.outputRemote('Console log: ' + msg);
+		}
 	};
 
 	/**
