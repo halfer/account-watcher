@@ -177,7 +177,7 @@ LoadHandlerBase.prototype.configureOnLoadFinished = function(page)
 				{
 					method.call(page.watcherHandler, page, status);
 				},
-				1500
+				1500 // @todo Maybe make a bit slower? Time it too to ensure it works :)
 			);
 		}
 		else

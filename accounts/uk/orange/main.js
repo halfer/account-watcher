@@ -6,6 +6,8 @@
  * @todo Move non-OO code into separate method
  * @todo Can we reduce reliance on full URLs?
  * @todo Can we get Orange working without SSL security disabled? (maybe get a repo of latest certs?)
+ * @todo Add in price data from "usage since your last bill" page
+ * @todo Add in a start/end timer and output run time in data call
  */
 
 // Load base object using relative path
@@ -303,6 +305,7 @@ function login()
 	loadHandler.configureAllStandardHandlers(page);
 	loadHandler.setExecutionTimeLimit(page);
 
+	// @todo Extend page and offer setters and getters - it's a bit messy atm
 	page.watcherId = loadHandler.constants.PAGE_LOGIN;
 	page.watcherHandler = loadHandler;
 	page.open('https://web.orange.co.uk/r/login/');
