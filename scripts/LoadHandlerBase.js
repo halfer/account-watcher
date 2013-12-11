@@ -62,6 +62,26 @@ LoadHandlerBase.prototype.standardParamChecks = function()
 	this.params = params;
 };
 
+LoadHandlerBase.prototype.setExecutionTimeLimit = function(page)
+{
+	if (this.params.executionTimeLimit)
+	{
+		// This is how to prevent a script accidentally crashing
+		setTimeout(
+			function()
+			{
+				page.watcherHandler.outputError('Page time limit exceeded');
+				phantom.exit();
+			},
+			this.params.executionTimeLimit * 1000
+		);
+	}
+	else
+	{
+		this.outputDebug('No execution time limit set, this is okay');
+	}
+};
+
 /**
  * Sets up the standard LoadStarted page event handler
  * 

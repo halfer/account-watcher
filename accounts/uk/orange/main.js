@@ -301,6 +301,7 @@ function login()
 
 	loadHandler.standardParamChecks();
 	loadHandler.configureAllStandardHandlers(page);
+	loadHandler.setExecutionTimeLimit(page);
 
 	page.watcherId = loadHandler.constants.PAGE_LOGIN;
 	page.watcherHandler = loadHandler;

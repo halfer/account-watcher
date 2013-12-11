@@ -6,7 +6,6 @@ $root = realpath(dirname(__FILE__));
 $sysConfigFile = $root . '/configs/system.ini';
 $sysConfigData = parse_ini_file($sysConfigFile);
 $executable = $sysConfigData['phantom_executable'];
-$echoRemote = (boolean) $sysConfigData['echo_remote_console'];
 
 // Load the account configuration
 $configFile = $root . '/configs/account.ini';
@@ -17,9 +16,10 @@ $script = $root . '/accounts/' . $configData['country'] . '/' . $configData['pro
 
 // Set up the parameters string in JSON
 $args = array(
-	'username' => $configData['username'],
-	'password' => $configData['password'],
-	'echoRemote' => $echoRemote,
+	'username'             => $configData['username'],
+	'password'             => $configData['password'],
+	'echoRemote'           => (boolean) $sysConfigData['echo_remote_console'],
+	'executionTimeLimit'   => (float) $configData['execution_time_limit'],
 );
 $line =  escapeshellarg(json_encode($args));
 
