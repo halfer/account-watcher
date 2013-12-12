@@ -1,10 +1,11 @@
 /* 
  * Script to obtain useful information from an Orange Your Account login in the UK.
  * 
- * @todo Configure each debug/info/data/etc type in a CSV list
+ * @todo Make a class in the run script, getting a bit untidy here
+ * @todo Run the database init script if the database does not exist
+ * @todo Test if folders are writeable
  * @todo Can we get Orange working without SSL security disabled? (maybe get a repo of latest certs?)
  * @todo Add in price data from "usage since your last bill" page
- * @todo Add in a start/end timer and output run time in data call
  */
 
 // Load base objects using relative path
