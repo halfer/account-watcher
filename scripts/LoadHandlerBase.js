@@ -34,6 +34,11 @@ LoadHandlerBase.prototype.outputRemote = function(msg)
 	console.log('[remote] ' + msg);		
 };
 
+LoadHandlerBase.prototype.getParams = function()
+{
+	return this.params;
+};
+
 /**
  * Loads the parameters and does some basic checks
  * 
@@ -95,7 +100,7 @@ LoadHandlerBase.prototype.configureOnLoadStarted = function(page)
 	 * This is called when a load has started
 	 */
 	page.onLoadStarted = function() {
-		page.watcherHandler.outputInfo('Page load started: ' + page.watcherId);
+		page.getLoadHandler().outputInfo('Page load started: ' + page.getWatcherId());
 	};
 };
 
@@ -114,13 +119,13 @@ LoadHandlerBase.prototype.configureOnUrlChanged = function(page)
 	 * @param targetUrl
 	 */
 	page.onUrlChanged = function(targetUrl) {
-		page.watcherHandler.outputDebug('URL changed: ' + targetUrl + ' on page: ' + page.watcherId);
+		page.getLoadHandler().outputDebug('URL changed: ' + targetUrl + ' on page: ' + page.getWatcherId());
 
 		// Call the custom handler, passing in interesting params
-		var method = page.watcherHandler['onUrlChanged' + page.watcherId];
+		var method = page.getLoadHandler()['onUrlChanged' + page.getWatcherId()];
 		if (typeof method === 'function')
 		{
-			method.call(page.watcherHandler, page, targetUrl);
+			method.call(page.getLoadHandler(), page, targetUrl);
 		}
 	};
 };
@@ -143,9 +148,9 @@ LoadHandlerBase.prototype.configureOnConsoleMessage = function(page)
 	 */
 	page.onConsoleMessage = function(msg)
 	{
-		if (page.watcherHandler.params.echoRemote)
+		if (page.getLoadHandler().params.echoRemote) // @todo Switch to getParams
 		{
-			page.watcherHandler.outputRemote('Console log: ' + msg);
+			page.getLoadHandler().outputRemote('Console log: ' + msg);
 		}
 	};
 };
@@ -165,24 +170,24 @@ LoadHandlerBase.prototype.configureOnLoadFinished = function(page)
 	 * @param status
 	 */
 	page.onLoadFinished = function(status) {
-		page.watcherHandler.outputInfo('Page load finished, page: ' + page.watcherId + ', status: ' + status);
+		page.getLoadHandler().outputInfo('Page load finished, page: ' + page.getWatcherId() + ', status: ' + status);
 
 		// Call the custom handler, passing in interesting params
-		var method = page.watcherHandler['onLoad' + page.watcherId];
+		var method = page.getLoadHandler()['onLoad' + page.getWatcherId()];
 		if (typeof method === 'function')
 		{
 			// Put in a small delay, so the server can breathe!
 			setTimeout(
 				function()
 				{
-					method.call(page.watcherHandler, page, status);
+					method.call(page.getLoadHandler(), page, status);
 				},
 				1500 // @todo Maybe make a bit slower? Time it too to ensure it works :)
 			);
 		}
 		else
 		{
-			page.watcherHandler.outputError('Handler missing for load event: ' + page.watcherId);
+			page.getLoadHandler().outputError('Handler missing for load event: ' + page.getWatcherId());
 		}
 	};
 };

@@ -11,7 +11,10 @@
  */
 
 // Load base object using relative path
-var ok = phantom.injectJs('../../../scripts/LoadHandlerBase.js');
+var ok = 
+	phantom.injectJs('../../../scripts/LoadHandlerBase.js') &&
+	phantom.injectJs('../../../scripts/WatcherPage.js')
+;
 if (!ok)
 {
 	console.log('Failed to load JS assets');
@@ -80,7 +83,7 @@ LoadHandler.prototype.onLoadLogin = function(page, status)
 	if (pageId === this.constants.PAGE_LOGIN)
 	{
 		this.outputInfo('Found login screen');
-		page.watcherId = this.constants.PAGE_LOGIN_SUBMITTED;
+		page.setWatcherId(this.constants.PAGE_LOGIN_SUBMITTED);
 		page.evaluate(
 			function(params)
 			{
@@ -89,7 +92,7 @@ LoadHandler.prototype.onLoadLogin = function(page, status)
 				document.querySelector('input[name=PASSWORD]').value = params.password;
 				document.querySelector('div.inner_left_ee form').submit();
 			},
-			page.watcherHandler.params
+			page.getLoadHandler().params // @todo Switch to getParams()
 		);
 	}
 	else if (pageId === this.constants.PAGE_ACCOUNT_HOME)
@@ -97,7 +100,7 @@ LoadHandler.prototype.onLoadLogin = function(page, status)
 		this.outputInfo('Found account page, already logged in');
 
 		// Emulates a finished event for the account page
-		page.watcherId = this.constants.PAGE_ACCOUNT_HOME;
+		page.setWatcherId(this.constants.PAGE_ACCOUNT_HOME);
 		page.onLoadFinished(status);
 	}
 	else
@@ -161,7 +164,7 @@ LoadHandler.prototype.onLoadLoginSubmitted = function(page, status)
 		this.outputInfo('Found email request screen');
 
 		// Point to the page we want to load
-		page.watcherId = this.constants.PAGE_ACCOUNT_HOME;
+		page.setWatcherId(this.constants.PAGE_ACCOUNT_HOME);
 		page.open('https://www.youraccount.orange.co.uk/sss/jfn?entry=true');
 	}
 	else
@@ -175,7 +178,7 @@ LoadHandler.prototype.onLoadAccountHome = function(page, status)
 	this.outputInfo('Now in account home screen');
 
 	// This will cause a redirect, and we're interested in the second one (the first one says "processing")
-	page.watcherId = this.constants.PAGE_ALLOWANCE_PREP;
+	page.setWatcherId(this.constants.PAGE_ALLOWANCE_PREP);
 	page.open('https://www.youraccount.orange.co.uk/sss/jfn?mfunc=877&cem=RMN0002_ViewRemMinAndText&jfnRC=1');
 };
 
@@ -211,7 +214,7 @@ LoadHandler.prototype.onUrlChangedAllowancePrep = function(page, targetUrl) {
 LoadHandler.prototype.switchToMainAllowanceScreen = function(page)
 {
 	this.outputInfo('Now in allowance preparation screen');
-	page.watcherId = this.constants.PAGE_ALLOWANCE_MAIN;
+	page.setWatcherId(this.constants.PAGE_ALLOWANCE_MAIN);
 };
 
 LoadHandler.prototype.onLoadAllowanceMain = function(page, status)
@@ -258,7 +261,7 @@ LoadHandler.prototype.onLoadAllowanceMain = function(page, status)
 	this.outputData(JSON.stringify(data));
 
 	// Finally pop over to the usage screen
-	page.watcherId = this.constants.PAGE_USAGE;
+	page.setWatcherId(this.constants.PAGE_USAGE);
 	page.open('https://www.youraccount.orange.co.uk/sss/jfn?mfunc=1559&jfnRC=6');
 };
 
@@ -297,7 +300,7 @@ function login()
 {
 	// Logon to the system
 	var
-		page = require('webpage').create(),
+		page = new WatcherPage(),
 		loadHandler = new LoadHandler()
 	;
 
@@ -305,9 +308,9 @@ function login()
 	loadHandler.configureAllStandardHandlers(page);
 	loadHandler.setExecutionTimeLimit(page);
 
-	// @todo Extend page and offer setters and getters - it's a bit messy atm
-	page.watcherId = loadHandler.constants.PAGE_LOGIN;
-	page.watcherHandler = loadHandler;
+	// Use the page child to set these internal values
+	page.setWatcherId(loadHandler.constants.PAGE_LOGIN);
+	page.setLoadHandler(loadHandler);
 	page.open('https://web.orange.co.uk/r/login/');
 }
 
