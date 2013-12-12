@@ -2,6 +2,9 @@ function LoadHandlerBase()
 {
 	// We'll load this in a bit
 	this.params = {};
+
+	// Set up per-use case
+	this.baseUrl = null;
 }
 
 LoadHandlerBase.prototype.outputInfo = function(msg)
@@ -37,6 +40,16 @@ LoadHandlerBase.prototype.outputRemote = function(msg)
 LoadHandlerBase.prototype.getParams = function()
 {
 	return this.params;
+};
+
+LoadHandlerBase.prototype.getBaseUrl = function()
+{
+	return this.baseUrl;
+};
+
+LoadHandlerBase.prototype.setBaseUrl = function(baseUrl)
+{
+	this.baseUrl = baseUrl;
 };
 
 /**

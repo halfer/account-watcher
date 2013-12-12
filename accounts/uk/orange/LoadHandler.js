@@ -15,6 +15,9 @@ function LoadHandler()
 	this.constants.PAGE_ALLOWANCE_PREP = 'AllowancePrep';
 	this.constants.PAGE_ALLOWANCE_MAIN = 'AllowanceMain';
 	this.constants.PAGE_USAGE = 'Usage';
+
+	// Base URL for most pages
+	this.setBaseUrl('https://www.youraccount.orange.co.uk');
 }
 
 /**
@@ -142,7 +145,7 @@ LoadHandler.prototype.onLoadLoginSubmitted = function(page, status)
 
 		// Point to the page we want to load
 		page.setWatcherId(this.constants.PAGE_ACCOUNT_HOME);
-		page.open('https://www.youraccount.orange.co.uk/sss/jfn?entry=true');
+		page.open(this.getBaseUrl() + '/sss/jfn?entry=true');
 	}
 	else
 	{
@@ -156,7 +159,7 @@ LoadHandler.prototype.onLoadAccountHome = function(page, status)
 
 	// This will cause a redirect, and we're interested in the second one (the first one says "processing")
 	page.setWatcherId(this.constants.PAGE_ALLOWANCE_PREP);
-	page.open('https://www.youraccount.orange.co.uk/sss/jfn?mfunc=877&cem=RMN0002_ViewRemMinAndText&jfnRC=1');
+	page.open(this.getBaseUrl() + '/sss/jfn?mfunc=877&cem=RMN0002_ViewRemMinAndText&jfnRC=1');
 };
 
 /**
@@ -239,7 +242,7 @@ LoadHandler.prototype.onLoadAllowanceMain = function(page, status)
 
 	// Finally pop over to the usage screen
 	page.setWatcherId(this.constants.PAGE_USAGE);
-	page.open('https://www.youraccount.orange.co.uk/sss/jfn?mfunc=1559&jfnRC=6');
+	page.open(this.getBaseUrl() + '/sss/jfn?mfunc=1559&jfnRC=6');
 };
 
 LoadHandler.prototype.onLoadUsage = function(page, status)
