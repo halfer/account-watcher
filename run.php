@@ -37,6 +37,20 @@ if ($configData['ignore_ssl_errors'])
 
 $optionsLine = implode(' ', $options);
 
+// Start timer
+$timeStart = microtime(true);
+
 // Run command
 $cmd = $executable . ' ' . $optionsLine . ' ' . $script . ' ' . $line;
-system($cmd);
+$output = array();
+exec($cmd, $output);
+
+// Write output to log
+$logDir = $root . '/logs/new/' . $configData['country'] . '/' . $configData['provider'];
+@mkdir($logDir, 0711, $_recursive = true);
+$logFile = $logDir . '/' . time() . '.log';
+file_put_contents($logFile, implode("\n", $output));
+echo sprintf("Wrote output to log file: %s\n", $logFile);
+
+$timeElapsed = microtime(true) - $timeStart;
+echo sprintf("Operation took %f seconds\n", $timeElapsed);
