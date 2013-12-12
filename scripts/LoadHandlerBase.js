@@ -53,31 +53,33 @@ LoadHandlerBase.prototype.setBaseUrl = function(baseUrl)
 };
 
 /**
- * Loads the parameters and does some basic checks
- * 
- * @todo Split this into loading params and checking them
+ * Grabs parameters from command line and sets them as an object property 
  */
-LoadHandlerBase.prototype.standardParamChecks = function()
+LoadHandlerBase.prototype.loadParameters = function()
 {
 	var system = require('system');
 
 	// Get the parameters from the launch script
 	var jsonString = system.args[1];
-	var params = JSON.parse(jsonString);
+	this.params = JSON.parse(jsonString);
+};
 
+/**
+ * Does some basic checks on the parameters
+ */
+LoadHandlerBase.prototype.standardParamChecks = function()
+{
 	// Check we have the necessary parameters
-	if (!params.username)
+	if (!this.getParams().username)
 	{
 		console.log('[error] This script requires a username');
 		phantom.exit();
 	}
-	if (!params.password)
+	if (!this.getParams().password)
 	{
 		console.log('[error] This script requires a password');
 		phantom.exit();
 	}
-
-	this.params = params;
 };
 
 LoadHandlerBase.prototype.setExecutionTimeLimit = function(page)

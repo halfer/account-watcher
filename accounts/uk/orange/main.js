@@ -31,6 +31,7 @@ function login()
 		loadHandler = new LoadHandler()
 	;
 
+	loadHandler.loadParameters();
 	loadHandler.standardParamChecks();
 	loadHandler.configureAllStandardHandlers(page);
 	loadHandler.setExecutionTimeLimit(page);
