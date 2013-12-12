@@ -3,7 +3,7 @@
  * 
  * @todo Does from-scratch script now have problems?
  * @todo Configure each debug/info/data/etc type in a CSV list
- * @todo Move non-OO code into separate method
+ * @todo Move LoadHandler to a new file
  * @todo Can we reduce reliance on full URLs?
  * @todo Can we get Orange working without SSL security disabled? (maybe get a repo of latest certs?)
  * @todo Add in price data from "usage since your last bill" page
@@ -92,7 +92,7 @@ LoadHandler.prototype.onLoadLogin = function(page, status)
 				document.querySelector('input[name=PASSWORD]').value = params.password;
 				document.querySelector('div.inner_left_ee form').submit();
 			},
-			page.getLoadHandler().params // @todo Switch to getParams()
+			page.getLoadHandler().getParams()
 		);
 	}
 	else if (pageId === this.constants.PAGE_ACCOUNT_HOME)
@@ -296,6 +296,9 @@ LoadHandler.prototype.onLoadUsage = function(page, status)
 	phantom.exit();
 };
 
+/**
+ * Main execute method
+ */
 function login()
 {
 	// Logon to the system

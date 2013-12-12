@@ -148,7 +148,7 @@ LoadHandlerBase.prototype.configureOnConsoleMessage = function(page)
 	 */
 	page.onConsoleMessage = function(msg)
 	{
-		if (page.getLoadHandler().params.echoRemote) // @todo Switch to getParams
+		if (page.getLoadHandler().getParams().echoRemote)
 		{
 			page.getLoadHandler().outputRemote('Console log: ' + msg);
 		}
