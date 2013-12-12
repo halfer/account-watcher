@@ -1,7 +1,6 @@
 /* 
  * Script to obtain useful information from an Orange Your Account login in the UK.
  * 
- * @todo Does from-scratch script now have problems?
  * @todo Configure each debug/info/data/etc type in a CSV list
  * @todo Can we get Orange working without SSL security disabled? (maybe get a repo of latest certs?)
  * @todo Add in price data from "usage since your last bill" page
