@@ -136,7 +136,7 @@ LoadHandler.prototype.onLoadLoginSubmitted = function(page, status)
 	if (pageId === this.constants.PAGE_LOGIN_FAILED)
 	{
 		this.outputError('The username and password settings are incorrect');
-		phantom.exit();				
+		this.doExit();
 	}
 	else if (pageId === this.constants.PAGE_EMAIL_REQUEST)
 	{
@@ -273,5 +273,5 @@ LoadHandler.prototype.onLoadUsage = function(page, status)
 	this.outputData(JSON.stringify(data));
 
 	// Exit before the log-out thingy reloads the page
-	phantom.exit();
+	this.doExit();
 };

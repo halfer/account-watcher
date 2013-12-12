@@ -30,6 +30,8 @@ function login()
 		loadHandler = new LoadHandler()
 	;
 
+	// Lots of luvely initialisation
+	loadHandler.doStart();
 	loadHandler.loadParameters();
 	loadHandler.standardParamChecks();
 	loadHandler.configureAllStandardHandlers(page);

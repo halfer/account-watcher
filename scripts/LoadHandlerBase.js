@@ -37,6 +37,19 @@ LoadHandlerBase.prototype.outputRemote = function(msg)
 	console.log('[remote] ' + msg);		
 };
 
+LoadHandlerBase.prototype.doStart = function()
+{
+	var date = new Date();
+	console.log('[start-time] ' + date.toString());
+};
+
+LoadHandlerBase.prototype.doExit = function()
+{
+	var date = new Date();
+	console.log('[exit-time] ' + date.toString());
+	phantom.exit();
+};
+
 LoadHandlerBase.prototype.getParams = function()
 {
 	return this.params;
@@ -73,12 +86,12 @@ LoadHandlerBase.prototype.standardParamChecks = function()
 	if (!this.getParams().username)
 	{
 		console.log('[error] This script requires a username');
-		phantom.exit();
+		this.doExit();
 	}
 	if (!this.getParams().password)
 	{
 		console.log('[error] This script requires a password');
-		phantom.exit();
+		this.doExit();
 	}
 };
 
@@ -87,11 +100,12 @@ LoadHandlerBase.prototype.setExecutionTimeLimit = function(page)
 	if (this.params.executionTimeLimit)
 	{
 		// This is how to prevent a script accidentally crashing
+		var that = this;
 		setTimeout(
 			function()
 			{
 				page.watcherHandler.outputError('Page time limit exceeded');
-				phantom.exit();
+				that.doExit();
 			},
 			this.params.executionTimeLimit * 1000
 		);
