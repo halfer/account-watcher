@@ -9,10 +9,18 @@ class Scanner
 		$this->root = $root;
 	}
 
+	public function execute()
+	{
+		// @todo Put more conditionals in this (if run ok, if scan ok, etc)
+		$this->runChecks();
+		$this->scan();
+		$this->extractData();
+	}
+
 	/**
 	 * @todo Put in various pre-run checks here e.g. log folder writability checks
 	 */
-	public function runChecks()
+	protected function runChecks()
 	{
 		
 	}
@@ -20,7 +28,7 @@ class Scanner
 	/**
 	 * Run the initialisation routines
 	 */
-	public function execute()
+	protected function scan()
 	{
 		// Start timer
 		$timeStart = microtime(true);
@@ -34,20 +42,44 @@ class Scanner
 		echo sprintf("Operation took %f seconds\n", $timeElapsed);		
 	}
 
+	protected function extractData()
+	{
+		
+	}
+
 	/**
 	 * Writes log file
 	 */
 	protected function writeLogFile(array $lines)
 	{
-		$logDir =
+		// Ensure the log file exists
+		@mkdir($this->getLogPath(), 0711, $_recursive = true);
+
+		$logFile = $this->getLogFile();
+		file_put_contents($logFile, implode("\n", $lines));
+		echo sprintf("Wrote output to log file: %s\n", $logFile);
+	}
+
+	protected function getLogPath()
+	{
+		return
 			$this->getRoot() .
 			'/logs/new/' . $this->getAccountIniValue('country') .
 			'/' . $this->getAccountIniValue('provider')
 		;
-		@mkdir($logDir, 0711, $_recursive = true);
-		$logFile = $logDir . '/' . time() . '.log';
-		file_put_contents($logFile, implode("\n", $lines));
-		echo sprintf("Wrote output to log file: %s\n", $logFile);
+	}
+
+	protected function getLogFile()
+	{
+		static $filename = null;
+
+		// This is static, so will only be set once
+		if (!$filename)
+		{
+			$filename = time() . '.log';
+		}
+
+		return $this->getLogPath() . '/' . $filename;
 	}
 
 	/**
@@ -156,5 +188,4 @@ class Scanner
 
 $root = realpath(dirname(__FILE__));
 $scanner = new Scanner($root);
-$scanner->runChecks();
 $scanner->execute();
