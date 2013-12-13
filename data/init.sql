@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS scan (
 	 *	- 2G of data per day during off-peak hours
 	 *
 	 * This explains how a user can have used 20G in total, but only be 1G into
-	 * their allowance.
+	 * their monthly allowance.
 	 */
 	data_usage_total VARCHAR,
 	data_allowance_used VARCHAR,

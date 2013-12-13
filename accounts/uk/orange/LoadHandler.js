@@ -226,12 +226,13 @@ LoadHandler.prototype.onLoadAllowanceMain = function(page, status)
 				lastUpdated = matchesDate[1]
 			;
 
+			// Any fields prefixed with "debug_" are not inserted into the database
 			return {
 				balance: textBalance,
-				allowance_text: textAllowance,
+				debug_allowance_text: textAllowance,
 				allowance_used: textAllowanceUsed,
 				allowance_remaining: textAllowanceRemaining,
-				last_updated_text: textLastUpdated,
+				debug_last_updated_text: textLastUpdated,
 				last_updated: lastUpdated
 			};
 		}
@@ -262,8 +263,9 @@ LoadHandler.prototype.onLoadUsage = function(page, status)
 				usageTotal = matchesUsage[1]
 			;
 
+			// Any fields prefixed with "debug_" are not inserted into the database
 			return {
-				usage_text: textUsage,
+				debug_usage_text: textUsage,
 				usage_total: usageTotal
 			};
 		}

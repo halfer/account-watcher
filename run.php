@@ -18,11 +18,31 @@ class Scanner
 	}
 
 	/**
-	 * @todo Put in various pre-run checks here e.g. log folder writability checks
+	 * Put in various pre-run checks here
 	 */
 	protected function runChecks()
 	{
-		
+		// @todo Add in some data/log folder writeability checks
+
+		// Does the database exist? Init it if not
+		$databaseFile = $this->getRoot() . '/data/data.sqlite';
+		if (!file_exists($databaseFile) || filesize($databaseFile) === 0)
+		{
+			$this->createDatabase($databaseFile);
+		}
+	}
+
+	protected function createDatabase($databaseFile)
+	{
+		$dbh = new PDO('sqlite:' . $databaseFile);
+		$queryFile = $this->getRoot() . '/data/init.sql';
+		$sql = file_get_contents($queryFile);
+
+		$affected = $dbh->exec($sql);
+		if ($affected !== 0)
+		{
+			die("Error: could not initialise SQLite database\n");
+		}
 	}
 
 	/**
@@ -74,6 +94,17 @@ class Scanner
 		foreach ($jsonStrings as $jsonString)
 		{
 			$thisData = json_decode($jsonString, true);
+
+			// Remove any debug keys (they're there just for logging purposes)
+			foreach(array_keys($thisData) as $key)
+			{
+				$isDebug = (boolean) preg_match('/^debug_/', $key);
+				if ($isDebug)
+				{
+					unset($thisData[$key]);
+				}
+			}
+
 			if (is_array($thisData))
 			{
 				$allData = array_merge($allData, $thisData);
