@@ -64,10 +64,8 @@ class Scanner
 
 	/**
 	 * Extracts data from the log file
-	 * 
-	 * @todo Make this protected
 	 */
-	public function extractData()
+	protected function extractData()
 	{
 		// For testing
 		//$logFile = $this->getLogPath() . '/1386935124.log';
