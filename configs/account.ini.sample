@@ -21,3 +21,7 @@ password = _password_
 
 ; Maximum time limit permitted on this script
 execution_time_limit = 300;
+
+; These specify how currency amounts are to be decoded
+currency_symbol = £
+currency_prefixed = true

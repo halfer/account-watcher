@@ -15,8 +15,12 @@
 CREATE TABLE IF NOT EXISTS provider (
 	id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 	name VARCHAR NOT NULL,
-	country VARCHAR NOT NULL
+	country VARCHAR NOT NULL,
+	currency_symbol VARCHAR NOT NULL,
+	currency_prefixed BOOLEAN NOT NULL
 );
+
+/* @todo Add unique constraint on (name, country, currency_symbol) */
 
 CREATE TABLE IF NOT EXISTS scan (
 	id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,

@@ -30,6 +30,9 @@ class Scanner
 		{
 			$this->createDatabase();
 		}
+
+		// Check there is a row for the provider matching our account details
+		$this->ensureProviderExists();
 	}
 
 	protected function createDatabase()
@@ -139,6 +142,8 @@ class Scanner
 			VALUES
 				(1, 2, 3, $paramList)
 		";
+
+		// @todo Fix placeholder data!
 		echo $sql . "\n";
 
 		// Check the query is okay
@@ -146,11 +151,69 @@ class Scanner
 		if ($stmt === false)
 		{
 			print_r($dbh->errorInfo());
+			die("Error: prepare error when recording data\n");
 			exit();
 		}
 
 		// Finally, run the query
-		$stmt->execute($allData);
+		$ok = $stmt->execute($allData);
+	}
+
+	protected function ensureProviderExists()
+	{
+		$params = array(
+			'name' => $this->getAccountIniValue('provider'),
+			'country' => $this->getAccountIniValue('country'),
+			'currency_symbol' => $this->getAccountIniValue('currency_symbol'),
+		);
+		$dbh = $this->getDatabaseHandle();
+
+		$sql = "
+			SELECT
+				*
+			FROM
+				provider
+			WHERE
+				name = :name
+				AND country = :country
+				AND currency_symbol = :currency_symbol
+			LIMIT
+				1
+		";
+		$stmt = $dbh->prepare($sql);
+		if ($stmt === false)
+		{
+			print_r($dbh->errorInfo());
+			die("Error: prepare error when checking provider\n");
+			exit();
+		}
+
+		$ok = $stmt->execute($params);
+		if (!$ok)
+		{
+			die("Error: query error when checking provider\n");
+		}
+
+		$rows = $stmt->rowCount();
+		if ($rows === 0)
+		{
+			$insertSql = "
+				INSERT INTO
+					provider
+					(name, country, currency_symbol, currency_prefixed)
+				VALUES
+					(:name, :country, :currency_symbol, :currency_prefixed)
+			";
+			$params['currency_prefixed'] = $this->getAccountIniValue('currency_prefixed');
+			$stmt = $dbh->prepare($insertSql);
+			if ($stmt === false)
+			{
+				print_r($dbh->errorInfo());
+				die("Error: prepare error when creating provider\n");
+				exit();
+			}
+			$ok = $stmt->execute($params);
+		}
 	}
 
 	protected function getDatabaseHandle()
