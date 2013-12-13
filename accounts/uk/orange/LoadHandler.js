@@ -228,11 +228,11 @@ LoadHandler.prototype.onLoadAllowanceMain = function(page, status)
 
 			return {
 				balance: textBalance,
-				allowanceText: textAllowance,
-				allowanceUsed: textAllowanceUsed,
-				allowanceRemaining: textAllowanceRemaining,
-				lastUpdatedText: textLastUpdated,
-				lastUpdated: lastUpdated
+				allowance_text: textAllowance,
+				allowance_used: textAllowanceUsed,
+				allowance_remaining: textAllowanceRemaining,
+				last_updated_text: textLastUpdated,
+				last_updated: lastUpdated
 			};
 		}
 	);
@@ -263,8 +263,8 @@ LoadHandler.prototype.onLoadUsage = function(page, status)
 			;
 
 			return {
-				usageText: textUsage,
-				usageTotal: usageTotal
+				usage_text: textUsage,
+				usage_total: usageTotal
 			};
 		}
 	);
