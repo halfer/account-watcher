@@ -211,7 +211,7 @@ LoadHandlerBase.prototype.configureOnLoadFinished = function(page)
 				{
 					method.call(page.getLoadHandler(), page, status);
 				},
-				1500 // @todo Maybe make a bit slower? Time it too to ensure it works :)
+				4000 // 4 seconds
 			);
 		}
 		else
