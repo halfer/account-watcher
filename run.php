@@ -25,19 +25,19 @@ class Scanner
 		// @todo Add in some data/log folder writeability checks
 
 		// Does the database exist? Init it if not
-		$databaseFile = $this->getRoot() . '/data/data.sqlite';
+		$databaseFile = $this->getDatabasePath();
 		if (!file_exists($databaseFile) || filesize($databaseFile) === 0)
 		{
-			$this->createDatabase($databaseFile);
+			$this->createDatabase();
 		}
 	}
 
-	protected function createDatabase($databaseFile)
+	protected function createDatabase()
 	{
-		$dbh = new PDO('sqlite:' . $databaseFile);
 		$queryFile = $this->getRoot() . '/data/init.sql';
 		$sql = file_get_contents($queryFile);
 
+		$dbh = $this->getDatabaseHandle();
 		$affected = $dbh->exec($sql);
 		if ($affected !== 0)
 		{
@@ -109,8 +109,78 @@ class Scanner
 			}
 		}
 
-		// @todo Store this data
 		print_r($allData);
+
+		// Unset any non-permitted columns, build parameter list
+		$params = array();
+		foreach (array_keys($allData) as $column)
+		{
+			// Check all the column name is permitted
+			if (!$this->isColumnNameAllowed($column))
+			{
+				// Remove this from list
+				unset($allData[$column]);
+				echo sprintf("Unrecognised column `%s`\n", $column);
+				continue;
+			}
+
+			$params[] = ':' . $column;
+		}
+		
+		$dbh = $this->getDatabaseHandle();
+
+		// Build the query
+		$paramList = implode(', ', $params);
+		$columnsList = implode(', ', array_keys($allData));
+		$sql = "
+			INSERT INTO
+				scan
+				(provider_id, time_start, time_end, {$columnsList})
+			VALUES
+				(1, 2, 3, $paramList)
+		";
+		echo $sql . "\n";
+
+		// Check the query is okay
+		$stmt = $dbh->prepare($sql);
+		if ($stmt === false)
+		{
+			print_r($dbh->errorInfo());
+			exit();
+		}
+
+		// Finally, run the query
+		$stmt->execute($allData);
+	}
+
+	protected function getDatabaseHandle()
+	{
+		static $dbh = null;
+
+		if (!$dbh)
+		{
+			$dbh = new PDO('sqlite:' . $this->getDatabasePath());
+		}
+
+		return $dbh;
+	}
+
+	protected function getDatabasePath()
+	{
+		return $this->getRoot() . '/data/data.sqlite';
+	}
+
+	protected function isColumnNameAllowed($name)
+	{
+		$allowed = array(
+			'allowance_remaining',
+			'allowance_used',
+			'balance',
+			'last_updated',
+			'usage_total'
+		);
+
+		return in_array($name, $allowed);
 	}
 
 	/**

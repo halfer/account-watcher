@@ -20,12 +20,12 @@ CREATE TABLE IF NOT EXISTS provider (
 
 CREATE TABLE IF NOT EXISTS scan (
 	id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-	provider_id INTEGER REFERENCES provider (id),
+	provider_id INTEGER REFERENCES provider (id) NOT NULL,
 	time_start INTEGER NOT NULL,
-	/* Not null as we may wish to write to the table prior to finishing */
-	time_end INTEGER,
-	/* All values prefixed with data_ come from the script */
-	data_last_updated VARCHAR,
+	time_end INTEGER NOT NULL,
+
+	/* All these values come from the script */
+	last_updated VARCHAR,
 	/*
 	 * We define "used" as the total amount of data used, including:
 	 *
@@ -40,9 +40,12 @@ CREATE TABLE IF NOT EXISTS scan (
 	 *
 	 * This explains how a user can have used 20G in total, but only be 1G into
 	 * their monthly allowance.
+	 *
+	 * @todo Make these numeric - they are well logged already
 	 */
-	data_usage_total VARCHAR,
-	data_allowance_used VARCHAR,
-	data_allowance_remaining VARCHAR,
-	data_allowance_total VARCHAR
+	allowance_used VARCHAR,
+	allowance_remaining VARCHAR,
+	allowance_total VARCHAR,
+	usage_total VARCHAR,
+	balance VARCHAR
 );
