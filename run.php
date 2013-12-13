@@ -14,24 +14,20 @@ class Scanner
 	 */
 	public function init()
 	{
-		// Load the system configuration
-		$sysConfigFile = $this->getRoot() . '/configs/system.ini';
-		$sysConfigData = parse_ini_file($sysConfigFile);
-		$executable = $sysConfigData['phantom_executable'];
-
-		// Load the account configuration
-		$configFile = $this->getRoot() . '/configs/account.ini';
-		$configData = parse_ini_file($configFile);
-
 		// Work out script location
-		$script = $this->getRoot() . '/accounts/' . $configData['country'] . '/' . $configData['provider'] . '/main.js';
+		$script =
+			$this->getRoot() .
+			'/accounts/' . $this->getAccountIniValue('country') .
+			'/' . $this->getAccountIniValue('provider') .
+			'/main.js'
+		;
 
 		// Set up the parameters string in JSON
 		$args = array(
-			'username'             => $configData['username'],
-			'password'             => $configData['password'],
-			'echoRemote'           => (boolean) $sysConfigData['echo_remote_console'],
-			'executionTimeLimit'   => (float) $configData['execution_time_limit'],
+			'username'             => $this->getAccountIniValue('username'),
+			'password'             => $this->getAccountIniValue('password'),
+			'echoRemote'           => (boolean) $this->getSystemIniValue('echo_remote_console'),
+			'executionTimeLimit'   => (float) $this->getAccountIniValue('execution_time_limit'),
 		);
 		$line =  escapeshellarg(json_encode($args));
 
@@ -42,7 +38,7 @@ class Scanner
 		);
 
 		// Add in SSL config
-		if ($configData['ignore_ssl_errors'])
+		if ($this->getAccountIniValue('ignore_ssl_errors'))
 		{
 			$options[] = '--ignore-ssl-errors=true';
 		}
@@ -53,12 +49,17 @@ class Scanner
 		$timeStart = microtime(true);
 
 		// Run command
+		$executable = $this->getSystemIniValue('phantom_executable');
 		$cmd = $executable . ' ' . $optionsLine . ' ' . $script . ' ' . $line;
 		$output = array();
 		exec($cmd, $output);
 
 		// Write output to log
-		$logDir = $this->getRoot() . '/logs/new/' . $configData['country'] . '/' . $configData['provider'];
+		$logDir =
+			$this->getRoot() .
+			'/logs/new/' . $this->getAccountIniValue('country') .
+			'/' . $this->getAccountIniValue('provider')
+		;
 		@mkdir($logDir, 0711, $_recursive = true);
 		$logFile = $logDir . '/' . time() . '.log';
 		file_put_contents($logFile, implode("\n", $output));
@@ -82,14 +83,42 @@ class Scanner
 	}
 
 	/**
-	 * Returns a value looked up from the config file
+	 * Returns a value looked up from the system config file
 	 * 
 	 * @param string $key
 	 * @return string
 	 */
-	protected function getIniValue($key)
+	protected function getSystemIniValue($key)
 	{
-		
+		return $this->getIniValue('system.ini', $key);
+	}
+
+	/**
+	 * Returns a value looked up from the account config file
+	 * 
+	 * @param string $key
+	 * @return string
+	 */
+	protected function getAccountIniValue($key)
+	{
+		return $this->getIniValue('account.ini', $key);
+	}
+
+	protected function getIniValue($file, $key)
+	{
+		static $configData = false;
+
+		if (!isset($configData[$file]))
+		{
+			$configFile = $this->getRoot() . '/configs/' . $file;
+			$configData[$file] = parse_ini_file($configFile);			
+		}
+
+		return
+			isset($configData[$file][$key]) ?
+			$configData[$file][$key] :
+			null
+		;
 	}
 }
 
