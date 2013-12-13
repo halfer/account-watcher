@@ -226,6 +226,8 @@ LoadHandler.prototype.onLoadAllowanceMain = function(page, status)
 				lastUpdated = matchesDate[1]
 			;
 
+			// @todo Fix up the short year format in "lastUpdated" to the long form
+
 			// Any fields prefixed with "debug_" are not inserted into the database
 			return {
 				balance: textBalance,
