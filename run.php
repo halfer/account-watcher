@@ -10,27 +10,80 @@ class Scanner
 	}
 
 	/**
+	 * @todo Put in various pre-run checks here e.g. log folder writability checks
+	 */
+	public function runChecks()
+	{
+		
+	}
+
+	/**
 	 * Run the initialisation routines
 	 */
-	public function init()
+	public function execute()
 	{
-		// Work out script location
-		$script =
+		// Start timer
+		$timeStart = microtime(true);
+
+		// Run command
+		$output = array();
+		exec($this->getCommandLine(), $output);
+		$this->writeLogFile($output);
+
+		$timeElapsed = microtime(true) - $timeStart;
+		echo sprintf("Operation took %f seconds\n", $timeElapsed);		
+	}
+
+	/**
+	 * Writes log file
+	 */
+	protected function writeLogFile(array $lines)
+	{
+		$logDir =
+			$this->getRoot() .
+			'/logs/new/' . $this->getAccountIniValue('country') .
+			'/' . $this->getAccountIniValue('provider')
+		;
+		@mkdir($logDir, 0711, $_recursive = true);
+		$logFile = $logDir . '/' . time() . '.log';
+		file_put_contents($logFile, implode("\n", $lines));
+		echo sprintf("Wrote output to log file: %s\n", $logFile);
+	}
+
+	/**
+	 * Derives the fully-qualified script path
+	 * 
+	 * @return string
+	 */
+	protected function getScriptPath()
+	{
+		return
 			$this->getRoot() .
 			'/accounts/' . $this->getAccountIniValue('country') .
 			'/' . $this->getAccountIniValue('provider') .
 			'/main.js'
 		;
+	}
 
-		// Set up the parameters string in JSON
+	/**
+	 * Builds the parameters string in JSON
+	 * 
+	 * @return string
+	 */
+	protected function getCommandLineParameters()
+	{
 		$args = array(
 			'username'             => $this->getAccountIniValue('username'),
 			'password'             => $this->getAccountIniValue('password'),
 			'echoRemote'           => (boolean) $this->getSystemIniValue('echo_remote_console'),
 			'executionTimeLimit'   => (float) $this->getAccountIniValue('execution_time_limit'),
 		);
-		$line =  escapeshellarg(json_encode($args));
 
+		return escapeshellarg(json_encode($args));
+	}
+
+	protected function getCommandLineOptions()
+	{
 		// Set up command options
 		$options = array(
 			'--load-images=false',
@@ -43,38 +96,17 @@ class Scanner
 			$options[] = '--ignore-ssl-errors=true';
 		}
 
-		$optionsLine = implode(' ', $options);
-
-		// Start timer
-		$timeStart = microtime(true);
-
-		// Run command
-		$executable = $this->getSystemIniValue('phantom_executable');
-		$cmd = $executable . ' ' . $optionsLine . ' ' . $script . ' ' . $line;
-		$output = array();
-		exec($cmd, $output);
-
-		// Write output to log
-		$logDir =
-			$this->getRoot() .
-			'/logs/new/' . $this->getAccountIniValue('country') .
-			'/' . $this->getAccountIniValue('provider')
-		;
-		@mkdir($logDir, 0711, $_recursive = true);
-		$logFile = $logDir . '/' . time() . '.log';
-		file_put_contents($logFile, implode("\n", $output));
-		echo sprintf("Wrote output to log file: %s\n", $logFile);
-
-		$timeElapsed = microtime(true) - $timeStart;
-		echo sprintf("Operation took %f seconds\n", $timeElapsed);		
+		return implode(' ', $options);
 	}
 
-	/**
-	 * @todo The init() method needs more splitting up
-	 */
-	protected function moreStuff()
+	protected function getCommandLine()	
 	{
-		
+		return
+			$this->getSystemIniValue('phantom_executable') . ' ' .
+			$this->getCommandLineOptions() . ' ' .
+			$this->getScriptPath() . ' ' .
+			$this->getCommandLineParameters()
+		;
 	}
 
 	protected function getRoot()
@@ -123,5 +155,6 @@ class Scanner
 }
 
 $root = realpath(dirname(__FILE__));
-$Scanner = new Scanner($root);
-$Scanner->init();
+$scanner = new Scanner($root);
+$scanner->runChecks();
+$scanner->execute();

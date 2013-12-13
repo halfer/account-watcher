@@ -1,9 +1,8 @@
 /* 
  * Script to obtain useful information from an Orange Your Account login in the UK.
  * 
- * @todo Make a class in the run script, getting a bit untidy here
  * @todo Run the database init script if the database does not exist
- * @todo Test if folders are writeable
+ * @todo Output warning if remote updated date is too old
  * @todo Can we get Orange working without SSL security disabled? (maybe get a repo of latest certs?)
  * @todo Add in price data from "usage since your last bill" page
  */
