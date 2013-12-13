@@ -42,9 +42,46 @@ class Scanner
 		echo sprintf("Operation took %f seconds\n", $timeElapsed);		
 	}
 
-	protected function extractData()
+	/**
+	 * Extracts data from the log file
+	 * 
+	 * @todo Make this protected
+	 */
+	public function extractData()
 	{
-		
+		// For testing
+		//$logFile = $this->getLogPath() . '/1386935124.log';
+		$logFile = $this->getLogFile();
+
+		$logData = file_get_contents($logFile);
+		$matches = array();
+		preg_match_all('/^\[data\]\s*(.+)\s*$/m', $logData, $matches);
+
+		// Retrieve the data from the parenthesis group
+		if (isset($matches[1]))
+		{
+			$this->storeExtractedData($matches[1]);
+		}
+		else
+		{
+			echo "No data found";
+		}
+	}
+
+	protected function storeExtractedData(array $jsonStrings)
+	{
+		$allData = array();
+		foreach ($jsonStrings as $jsonString)
+		{
+			$thisData = json_decode($jsonString, true);
+			if (is_array($thisData))
+			{
+				$allData = array_merge($allData, $thisData);
+			}
+		}
+
+		// @todo Store this data
+		print_r($allData);
 	}
 
 	/**
@@ -189,3 +226,4 @@ class Scanner
 $root = realpath(dirname(__FILE__));
 $scanner = new Scanner($root);
 $scanner->execute();
+//$scanner->extractData();
