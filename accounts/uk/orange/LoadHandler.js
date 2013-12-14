@@ -272,10 +272,13 @@ LoadHandler.prototype.onLoadUsage = function(page, status)
 			// Any fields prefixed with "debug_" are not inserted into the database
 			return {
 				debug_usage_text: textUsage,
-				usage_total: usageTotal
+				debug_usage_total: usageTotal
 			};
 		}
 	);
+
+	// Convert bandwidth values to integers
+	data.usage_total = this.convertSizeExpression(data.debug_usage_total);
 
 	// Output the data
 	this.outputData(JSON.stringify(data));

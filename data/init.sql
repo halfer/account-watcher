@@ -44,11 +44,9 @@ CREATE TABLE IF NOT EXISTS scan (
 	 *
 	 * This explains how a user can have used 20G in total, but only be 1G into
 	 * their monthly allowance.
-	 *
-	 * @todo Make these numeric - they are well logged already
 	 */
-	allowance_used VARCHAR,
-	allowance_remaining VARCHAR,
+	allowance_used INTEGER,
+	allowance_remaining INTEGER,
 	allowance_total VARCHAR,
 	usage_total VARCHAR,
 	balance VARCHAR
