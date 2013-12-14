@@ -68,8 +68,7 @@ LoadHandlerBase.prototype.setBaseUrl = function(baseUrl)
 /**
  * Takes a size string (123.24MB, 1.3GB) and converts it to an approximate number of bytes
  * 
- * I'll assume 1MB = 1000*1000 for now, and 1GB = 1000M. Can make this configurable if a provider can be
- * shown to measure in powers of 2 instead.
+ * The number of bytes/K, Kbytes/M, and Mbytes/G are configurable per account
  *  
  * @param expr
  * @returns integer
@@ -79,6 +78,8 @@ LoadHandlerBase.prototype.convertSizeExpression = function(expr)
 	var
 		exprPattern = /([\d.]+)\s?(MB|GB)/,
 		matches = expr.match(exprPattern),
+		bytesPerM = this.getParams().bytesPerK * this.getParams().kbytesPerM,
+		bytesPerG = bytesPerM * this.getParams().mbytesPerG,
 		bytes = null;
 
 	if (matches.length === 3)
@@ -87,11 +88,11 @@ LoadHandlerBase.prototype.convertSizeExpression = function(expr)
 
 		if (matches[2] === 'MB')
 		{
-			bytes = bytes * 1000 * 1000;
+			bytes = bytes * bytesPerM;
 		}
 		else if (matches[2] === 'GB')
 		{
-			bytes = bytes * 1000 * 1000 * 1000;
+			bytes = bytes * bytesPerG;
 		}
 	}
 	else

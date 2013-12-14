@@ -31,6 +31,7 @@ class Scanner
 	protected function runChecks()
 	{
 		// @todo Add in some data/log folder writeability checks
+		// @todo Add some sensibility checks for account/system settings
 
 		// Does the database exist? Init it if not
 		$databaseFile = $this->getDatabasePath();
@@ -323,6 +324,9 @@ class Scanner
 			'password'             => $this->getAccountIniValue('password'),
 			'echoRemote'           => (boolean) $this->getSystemIniValue('echo_remote_console'),
 			'executionTimeLimit'   => (float) $this->getAccountIniValue('execution_time_limit'),
+			'bytesPerK'            => (integer) $this->getAccountIniValue('bytes_per_k'),
+			'kbytesPerM'           => (integer) $this->getAccountIniValue('kbytes_per_m'),
+			'mbytesPerG'           => (integer) $this->getAccountIniValue('mbytes_per_g'),
 		);
 
 		return escapeshellarg(json_encode($args));

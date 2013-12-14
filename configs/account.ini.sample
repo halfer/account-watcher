@@ -25,3 +25,8 @@ execution_time_limit = 300;
 ; These specify how currency amounts are to be decoded
 currency_symbol = £
 currency_prefixed = true
+
+; Decide how MB/GB values are understood
+bytes_per_k = 1000
+kbytes_per_m = 1000
+mbytes_per_g = 1000
