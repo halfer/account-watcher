@@ -1,12 +1,8 @@
 ; ****
-; Configuration ini file for Account Watcher
+; Configuration ini file for Orange UK mobile accounts
 ;
-; Copy this file (config.ini.sample) as config.ini and save it in the same folder. Then,
-; complete the details for your provider (if it is supported) and your username and
-; password.
-;
-; Some provider folders may have their own sample, which will use some more appropriate
-; default settings.
+; Copy this file (config.ini.sample) as config.ini and save it in the configs folder. Then,
+; complete your username and password fields.
 ; ****
 
 ; The country is the first-level folder in the "accounts" folder
@@ -15,15 +11,15 @@ country = uk
 ; The provider is the name of the script in the country folder, minus the ".js" suffix
 provider = orange
 
-; Needed with some SSL configurations
-ignore_ssl_errors = false
+; Required for Orange's website
+ignore_ssl_errors = true
 
 ; These are user-specific
 username = _username_
 password = _password_
 
 ; Maximum time limit permitted on this script
-execution_time_limit = 300;
+execution_time_limit = 180;
 
 ; These specify how currency amounts are to be decoded
 currency_symbol = £
@@ -32,4 +28,5 @@ currency_prefixed = true
 ; Decide how MB/GB values are understood
 bytes_per_k = 1000
 kbytes_per_m = 1000
-mbytes_per_g = 1000
+; A 3GB plan with Orange offers 3072M, so 1GB must be 1024M
+mbytes_per_g = 1024
