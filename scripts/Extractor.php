@@ -40,7 +40,8 @@ class Extractor extends SystemBase
 			echo "No data found";
 		}
 
-		// @todo If ok, move the file to the done pile
+		// If ok, move the file to the done pile
+		$this->moveToProcessedFolder($logFile);
 	}
 
 	protected function storeExtractedData(array $jsonStrings)
@@ -111,5 +112,23 @@ class Extractor extends SystemBase
 
 		// Finally, run the query
 		$ok = $stmt->execute($allData);
+	}
+
+	protected function moveToProcessedFolder($logFile)
+	{
+		// This results in a relative file reference, e.g. "/uk/orange/1381943492.log"
+		$newFolder = $this->getRoot() . '/logs/new';
+		$relative = substr($logFile, strlen($newFolder));
+		$destination = $this->getRoot() . '/logs/processed' . $relative;
+
+		// Ensure the directory exists
+		@mkdir(dirname($destination), 0711, $_recursive = true);
+
+		// Do the rename, and check it
+		$ok = rename($logFile, $destination);
+		if (!$ok)
+		{
+			echo "Error: rename failed\n";
+		}
 	}
 }
