@@ -66,6 +66,41 @@ LoadHandlerBase.prototype.setBaseUrl = function(baseUrl)
 };
 
 /**
+ * Takes a size string (123.24M, 1.3G) and converts it to an approximate number of bytes
+ * 
+ * I'll assume 1M = 1000*1000 for now, and 1G = 1000M. Can make this configurable if a provider can be
+ * shown to measure in powers of 2 instead.
+ *  
+ * @param expr
+ * @returns integer
+ */
+LoadHandlerBase.prototype.convertSizeExpression = function(expr)
+{
+	var
+		exprPattern = /([\d.]+)\s?(M|G)/,
+		matches = expr.match(exprPattern),
+		bytes = null;
+
+	if (matches.length === 3)
+	{
+		bytes = parseFloat(matches[1]);
+
+		if (matches[2] === 'M')
+		{
+			bytes = bytes * 1000 * 1000;
+		}
+		else if (matches[2] === 'G')
+		{
+			bytes = bytes * 1000 * 1000 * 1000;
+		}
+	}
+
+	this.outputInfo("Byte size conversion: " + matches[1] + matches[2] + ' = ' + bytes);
+
+	return bytes;
+};
+
+/**
  * Grabs parameters from command line and sets them as an object property 
  */
 LoadHandlerBase.prototype.loadParameters = function()

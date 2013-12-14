@@ -232,13 +232,17 @@ LoadHandler.prototype.onLoadAllowanceMain = function(page, status)
 			return {
 				balance: textBalance,
 				debug_allowance_text: textAllowance,
-				allowance_used: textAllowanceUsed,
-				allowance_remaining: textAllowanceRemaining,
+				debug_allowance_used: textAllowanceUsed,
+				debug_allowance_remaining: textAllowanceRemaining,
 				debug_last_updated_text: textLastUpdated,
 				last_updated: lastUpdated
 			};
 		}
 	);
+
+	// Convert bandwidth values to integers
+	data.allowance_used = this.convertSizeExpression(data.debug_allowance_used);
+	data.allowance_remaining = this.convertSizeExpression(data.debug_allowance_remaining);
 
 	// Output the data
 	this.outputData(JSON.stringify(data));

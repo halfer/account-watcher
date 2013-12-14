@@ -6,5 +6,5 @@ phantom_executable = phantomjs
 ; Decide whether to output remote console logs
 echo_remote_console = false
 
-; Write output to screen
+; Write output to screen (won't log or add to database)
 test_mode = false
