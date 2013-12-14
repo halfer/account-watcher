@@ -83,6 +83,8 @@ class Scanner
 
 	/**
 	 * Extracts data from the log file
+	 * 
+	 * @todo Separate this out into another class
 	 */
 	protected function extractData()
 	{
@@ -407,4 +409,3 @@ class Scanner
 $root = realpath(dirname(__FILE__));
 $scanner = new Scanner($root);
 $scanner->execute();
-//$scanner->extractData();

@@ -1,7 +1,6 @@
 /* 
  * Script to obtain useful information from an Orange Your Account login in the UK.
  * 
- * @todo Run the database init script if the database does not exist
  * @todo Output warning if remote updated date is too old
  * @todo Add bill start date to uk/orange
  * @todo Allow data allowances to be configured in accounts.ini
