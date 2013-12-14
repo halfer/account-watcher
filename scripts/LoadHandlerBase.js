@@ -66,9 +66,9 @@ LoadHandlerBase.prototype.setBaseUrl = function(baseUrl)
 };
 
 /**
- * Takes a size string (123.24M, 1.3G) and converts it to an approximate number of bytes
+ * Takes a size string (123.24MB, 1.3GB) and converts it to an approximate number of bytes
  * 
- * I'll assume 1M = 1000*1000 for now, and 1G = 1000M. Can make this configurable if a provider can be
+ * I'll assume 1MB = 1000*1000 for now, and 1GB = 1000M. Can make this configurable if a provider can be
  * shown to measure in powers of 2 instead.
  *  
  * @param expr
@@ -77,7 +77,7 @@ LoadHandlerBase.prototype.setBaseUrl = function(baseUrl)
 LoadHandlerBase.prototype.convertSizeExpression = function(expr)
 {
 	var
-		exprPattern = /([\d.]+)\s?(M|G)/,
+		exprPattern = /([\d.]+)\s?(MB|GB)/,
 		matches = expr.match(exprPattern),
 		bytes = null;
 
@@ -85,14 +85,18 @@ LoadHandlerBase.prototype.convertSizeExpression = function(expr)
 	{
 		bytes = parseFloat(matches[1]);
 
-		if (matches[2] === 'M')
+		if (matches[2] === 'MB')
 		{
 			bytes = bytes * 1000 * 1000;
 		}
-		else if (matches[2] === 'G')
+		else if (matches[2] === 'GB')
 		{
 			bytes = bytes * 1000 * 1000 * 1000;
 		}
+	}
+	else
+	{
+		this.outputError('Could not parse size expression');
 	}
 
 	this.outputInfo("Byte size conversion: " + matches[1] + matches[2] + ' = ' + bytes);
