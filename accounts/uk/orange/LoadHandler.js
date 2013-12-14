@@ -11,6 +11,7 @@ function LoadHandler()
 	// This is either the email request or the account home, don't care
 	this.constants.PAGE_LOGIN_SUBMITTED = 'LoginSubmitted';
 	this.constants.PAGE_EMAIL_REQUEST = 'Email';
+	this.constants.PAGE_MAINTENANCE = 'Maintenance';
 	this.constants.PAGE_ACCOUNT_HOME = 'AccountHome';
 	this.constants.PAGE_ALLOWANCE_PREP = 'AllowancePrep';
 	this.constants.PAGE_ALLOWANCE_MAIN = 'AllowanceMain';
@@ -110,6 +111,9 @@ LoadHandler.prototype.onLoadLoginSubmitted = function(page, status)
 				elementEmail = document.querySelector('.login-flow h2'),
 				titleEmail = elementEmail ? elementEmail.innerText : '',
 
+				elementDown = document.querySelector('#CommonFullScreenNotification .ee-general-technical'),
+				textDown = elementDown ? elementDown.innerText : '',
+
 				pageId = null
 			;
 
@@ -124,6 +128,10 @@ LoadHandler.prototype.onLoadLoginSubmitted = function(page, status)
 			)
 			{
 				pageId = context.constants.PAGE_EMAIL_REQUEST;
+			}
+			else if (textDown.indexOf('Please try again in a little while') > -1)
+			{
+				pageId = context.constants.PAGE_MAINTENANCE;
 			}
 
 			return pageId;
@@ -146,6 +154,11 @@ LoadHandler.prototype.onLoadLoginSubmitted = function(page, status)
 		// Point to the page we want to load
 		page.setWatcherId(this.constants.PAGE_ACCOUNT_HOME);
 		page.open(this.getBaseUrl() + '/sss/jfn?entry=true');
+	}
+	else if (pageId === this.constants.PAGE_MAINTENANCE)
+	{
+		this.outputError('The remote site is down for maintenance');
+		this.doExit();
 	}
 	else
 	{
