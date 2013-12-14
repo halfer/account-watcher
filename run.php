@@ -13,8 +13,16 @@ class Scanner
 	{
 		// @todo Put more conditionals in this (if run ok, if scan ok, etc)
 		$this->runChecks();
-		$this->scan();
-		$this->extractData();
+
+		if ($this->getSystemIniValue('test_mode'))
+		{
+			$this->scan(true);
+		}
+		else
+		{
+			$this->scan();
+			$this->extractData();
+		}
 	}
 
 	/**
@@ -51,15 +59,22 @@ class Scanner
 	/**
 	 * Run the initialisation routines
 	 */
-	protected function scan()
+	protected function scan($testMode = false)
 	{
 		// Start timer
 		$timeStart = microtime(true);
 
 		// Run command
-		$output = array();
-		exec($this->getCommandLine(), $output);
-		$this->writeLogFile($output);
+		if ($testMode)
+		{
+			system($this->getCommandLine());
+		}
+		else
+		{
+			$output = array();
+			exec($this->getCommandLine(), $output);
+			$this->writeLogFile($output);
+		}
 
 		$timeElapsed = microtime(true) - $timeStart;
 		echo sprintf("Operation took %f seconds\n", $timeElapsed);		
