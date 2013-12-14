@@ -31,7 +31,9 @@ CREATE TABLE IF NOT EXISTS scan (
 	/* All these values come from the script */
 	last_updated VARCHAR,
 	/*
-	 * We define "used" as the total amount of data used, including:
+	 * Notes:
+	 *
+	 * 1. We define "used" as the total amount of data used, including:
 	 *
 	 * Anything used within an allowance
 	 * Anything used outside an allowance that is chargeable
@@ -44,9 +46,16 @@ CREATE TABLE IF NOT EXISTS scan (
 	 *
 	 * This explains how a user can have used 20G in total, but only be 1G into
 	 * their monthly allowance.
+	 *
+	 * 2. Bandwidth values are stored as text (e.g. 1234.1 MB) and as integers too. This is because the
+	 * user may select that 1024M = 1G only to find that their provider uses 1000M = 1G. In those
+	 * circumstances it would be nice to be able to recalculate.
 	 */
+	allowance_used_text VARCHAR,
 	allowance_used INTEGER,
+	allowance_remaining_text INTEGER,
 	allowance_remaining INTEGER,
-	usage_total VARCHAR,
+	usage_total_text VARCHAR,
+	usage_total INTEGER,
 	balance VARCHAR
 );

@@ -18,11 +18,14 @@ class SystemBase
 	protected function isColumnNameAllowed($name)
 	{
 		$allowed = array(
-			'allowance_remaining',
+			'allowance_used_text',
 			'allowance_used',
+			'allowance_remaining_text',
+			'allowance_remaining',
+			'usage_total_text',
+			'usage_total',
 			'balance',
 			'last_updated',
-			'usage_total'
 		);
 
 		return in_array($name, $allowed);

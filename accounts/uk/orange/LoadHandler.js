@@ -244,18 +244,18 @@ LoadHandler.prototype.onLoadAllowanceMain = function(page, status)
 			// Any fields prefixed with "debug_" are not inserted into the database
 			return {
 				balance: textBalance,
-				debug_allowance_text: textAllowance,
-				debug_allowance_used: textAllowanceUsed,
-				debug_allowance_remaining: textAllowanceRemaining,
-				debug_last_updated_text: textLastUpdated,
+				debug_allowance_phrase: textAllowance,
+				allowance_used_text: textAllowanceUsed,
+				allowance_remaining_text: textAllowanceRemaining,
+				debug_last_updated_phrase: textLastUpdated,
 				last_updated: lastUpdated
 			};
 		}
 	);
 
 	// Convert bandwidth values to integers
-	data.allowance_used = this.convertSizeExpression(data.debug_allowance_used);
-	data.allowance_remaining = this.convertSizeExpression(data.debug_allowance_remaining);
+	data.allowance_used = this.convertSizeExpression(data.allowance_used_text);
+	data.allowance_remaining = this.convertSizeExpression(data.allowance_remaining_text);
 
 	// Output the data
 	this.outputData(JSON.stringify(data));
@@ -284,14 +284,14 @@ LoadHandler.prototype.onLoadUsage = function(page, status)
 
 			// Any fields prefixed with "debug_" are not inserted into the database
 			return {
-				debug_usage_text: textUsage,
-				debug_usage_total: usageTotal
+				debug_usage_phrase: textUsage,
+				usage_total_text: usageTotal
 			};
 		}
 	);
 
 	// Convert bandwidth values to integers
-	data.usage_total = this.convertSizeExpression(data.debug_usage_total);
+	data.usage_total = this.convertSizeExpression(data.usage_total_text);
 
 	// Output the data
 	this.outputData(JSON.stringify(data));
