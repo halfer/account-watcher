@@ -1,6 +1,8 @@
 <?php
 
-class Scanner
+require_once 'SystemBase.php';
+
+class Scanner extends SystemBase
 {
 	protected $root;
 
@@ -14,15 +16,7 @@ class Scanner
 		// @todo Put more conditionals in this (if run ok, if scan ok, etc)
 		$this->runChecks();
 
-		if ($this->getSystemIniValue('test_mode'))
-		{
-			$this->scan(true);
-		}
-		else
-		{
-			$this->scan();
-			$this->extractData();
-		}
+		$this->scan($this->getSystemIniValue('test_mode'));
 	}
 
 	/**
@@ -79,102 +73,6 @@ class Scanner
 
 		$timeElapsed = microtime(true) - $timeStart;
 		echo sprintf("Operation took %f seconds\n", $timeElapsed);		
-	}
-
-	/**
-	 * Extracts data from the log file
-	 * 
-	 * @todo Separate this out into another class
-	 */
-	protected function extractData()
-	{
-		// For testing
-		//$logFile = $this->getLogPath() . '/1386935124.log';
-		$logFile = $this->getLogFile();
-
-		$logData = file_get_contents($logFile);
-		$matches = array();
-		preg_match_all('/^\[data\]\s*(.+)\s*$/m', $logData, $matches);
-
-		// Retrieve the data from the parenthesis group
-		if (isset($matches[1]))
-		{
-			$this->storeExtractedData($matches[1]);
-		}
-		else
-		{
-			echo "No data found";
-		}
-	}
-
-	protected function storeExtractedData(array $jsonStrings)
-	{
-		$allData = array();
-		foreach ($jsonStrings as $jsonString)
-		{
-			$thisData = json_decode($jsonString, true);
-
-			// Remove any debug keys (they're there just for logging purposes)
-			foreach(array_keys($thisData) as $key)
-			{
-				$isDebug = (boolean) preg_match('/^debug_/', $key);
-				if ($isDebug)
-				{
-					unset($thisData[$key]);
-				}
-			}
-
-			if (is_array($thisData))
-			{
-				$allData = array_merge($allData, $thisData);
-			}
-		}
-
-		print_r($allData);
-
-		// Unset any non-permitted columns, build parameter list
-		$params = array();
-		foreach (array_keys($allData) as $column)
-		{
-			// Check all the column name is permitted
-			if (!$this->isColumnNameAllowed($column))
-			{
-				// Remove this from list
-				unset($allData[$column]);
-				echo sprintf("Unrecognised column `%s`\n", $column);
-				continue;
-			}
-
-			$params[] = ':' . $column;
-		}
-		
-		$dbh = $this->getDatabaseHandle();
-
-		// Build the query
-		$paramList = implode(', ', $params);
-		$columnsList = implode(', ', array_keys($allData));
-		$sql = "
-			INSERT INTO
-				scan
-				(provider_id, time_start, time_end, {$columnsList})
-			VALUES
-				(1, 2, 3, $paramList)
-		";
-
-		// @todo Fix placeholder data!
-		echo $sql . "\n";
-
-		// Check the query is okay
-		$stmt = $dbh->prepare($sql);
-		if ($stmt === false)
-		{
-			print_r($dbh->errorInfo());
-			die("Error: prepare error when recording data\n");
-			exit();
-		}
-
-		// Finally, run the query
-		$ok = $stmt->execute($allData);
 	}
 
 	protected function ensureProviderExists()
@@ -234,36 +132,6 @@ class Scanner
 		}
 	}
 
-	protected function getDatabaseHandle()
-	{
-		static $dbh = null;
-
-		if (!$dbh)
-		{
-			$dbh = new PDO('sqlite:' . $this->getDatabasePath());
-		}
-
-		return $dbh;
-	}
-
-	protected function getDatabasePath()
-	{
-		return $this->getRoot() . '/data/data.sqlite';
-	}
-
-	protected function isColumnNameAllowed($name)
-	{
-		$allowed = array(
-			'allowance_remaining',
-			'allowance_used',
-			'balance',
-			'last_updated',
-			'usage_total'
-		);
-
-		return in_array($name, $allowed);
-	}
-
 	/**
 	 * Writes log file
 	 */
@@ -275,15 +143,6 @@ class Scanner
 		$logFile = $this->getLogFile();
 		file_put_contents($logFile, implode("\n", $lines));
 		echo sprintf("Wrote output to log file: %s\n", $logFile);
-	}
-
-	protected function getLogPath()
-	{
-		return
-			$this->getRoot() .
-			'/logs/new/' . $this->getAccountIniValue('country') .
-			'/' . $this->getAccountIniValue('provider')
-		;
 	}
 
 	protected function getLogFile()
@@ -358,50 +217,6 @@ class Scanner
 			$this->getCommandLineOptions() . ' ' .
 			$this->getScriptPath() . ' ' .
 			$this->getCommandLineParameters()
-		;
-	}
-
-	protected function getRoot()
-	{
-		return $this->root;
-	}
-
-	/**
-	 * Returns a value looked up from the system config file
-	 * 
-	 * @param string $key
-	 * @return string
-	 */
-	protected function getSystemIniValue($key)
-	{
-		return $this->getIniValue('system.ini', $key);
-	}
-
-	/**
-	 * Returns a value looked up from the account config file
-	 * 
-	 * @param string $key
-	 * @return string
-	 */
-	protected function getAccountIniValue($key)
-	{
-		return $this->getIniValue('account.ini', $key);
-	}
-
-	protected function getIniValue($file, $key)
-	{
-		static $configData = false;
-
-		if (!isset($configData[$file]))
-		{
-			$configFile = $this->getRoot() . '/configs/' . $file;
-			$configData[$file] = parse_ini_file($configFile);			
-		}
-
-		return
-			isset($configData[$file][$key]) ?
-			$configData[$file][$key] :
-			null
 		;
 	}
 }
