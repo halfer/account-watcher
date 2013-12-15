@@ -21,6 +21,8 @@ class Scanner extends SystemBase
 
 	/**
 	 * Put in various pre-run checks here
+	 * 
+	 * @todo Move the database checks to the parent, run them from the Scanner too
 	 */
 	protected function runChecks()
 	{
@@ -110,8 +112,8 @@ class Scanner extends SystemBase
 			die("Error: query error when checking provider\n");
 		}
 
-		$rows = $stmt->fetchColumn();
-		if ($rows === 0)
+		$rows = (int) $stmt->fetchColumn();
+		if (!$rows)
 		{
 			$insertSql = "
 				INSERT INTO
