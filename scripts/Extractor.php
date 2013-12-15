@@ -27,17 +27,17 @@ class Extractor extends SystemBase
 	protected function extractData($logFile)
 	{
 		$logData = file_get_contents($logFile);
-		$matches = array();
-		preg_match_all('/^\[data\]\s*(.+)\s*$/m', $logData, $matches);
+		$jsonStrings = $this->getJsonStrings($logData);
+		list($startTime, $endTime) = $this->getLogTimes($logData);
 
 		// Extract country/provider from log path, find the provider ID
 		list($country, $provider) = $this->getLogDetails($logFile);
 		$providerId = $this->getProviderId($country, $provider);
 
 		// Retrieve the data from the parenthesis group
-		if (isset($matches[1]))
+		if (isset($jsonStrings))
 		{
-			$this->storeExtractedData($matches[1], $providerId);
+			$this->storeExtractedData($jsonStrings, $providerId, $startTime, $endTime);
 		}
 		else
 		{
@@ -46,6 +46,14 @@ class Extractor extends SystemBase
 
 		// If ok, move the file to the done pile
 		$this->moveToProcessedFolder($logFile);
+	}
+
+	protected function getJsonStrings($logData)
+	{
+		$matches = array();
+		preg_match_all('/^\[data\]\s*(.+)\s*$/m', $logData, $matches);
+
+		return isset($matches[1]) ? $matches[1] : null;
 	}
 
 	protected function getLogDetails($logFile)
@@ -81,7 +89,35 @@ class Extractor extends SystemBase
 		return $id;
 	}
 
-	protected function storeExtractedData(array $jsonStrings, $providerId)
+	protected function getLogTimes($logData)
+	{
+		$matches = array();
+		$startTime = $endTime = null;
+
+		preg_match('/^\[start-time\]\s*(.+)\s*$/m', $logData, $matches);
+		if (isset($matches[1]))
+		{
+			$startTime = strtotime($matches[1]);
+		}
+		else
+		{
+			echo "Warning: start time not found in log";
+		}
+
+		preg_match('/^\[exit-time\]\s*(.+)\s*$/m', $logData, $matches);
+		if (isset($matches[1]))
+		{
+			$endTime = strtotime($matches[1]);
+		}
+		else
+		{
+			echo "Warning: end time not found in log";
+		}
+
+		return array($startTime, $endTime);
+	}
+
+	protected function storeExtractedData(array $jsonStrings, $providerId, $startTime, $endTime)
 	{
 		$allData = array();
 		foreach ($jsonStrings as $jsonString)
@@ -103,8 +139,6 @@ class Extractor extends SystemBase
 				$allData = array_merge($allData, $thisData);
 			}
 		}
-
-		print_r($allData);
 
 		// Unset any non-permitted columns, build parameter list
 		$params = array();
@@ -132,10 +166,9 @@ class Extractor extends SystemBase
 				scan
 				(provider_id, time_start, time_end, {$columnsList})
 			VALUES
-				(:provider_id, 0, 0, $paramList)
+				(:provider_id, :start_time, :end_time, $paramList)
 		";
 
-		// FIXME Fix placeholder data for start/end dates!
 		echo $sql . "\n";
 
 		// Check the query is okay
@@ -149,6 +182,10 @@ class Extractor extends SystemBase
 
 		// Set up some parameters not from the log file
 		$allData['provider_id'] = $providerId;
+		$allData['start_time'] = $startTime;
+		$allData['end_time'] = $endTime;
+
+		print_r($allData);
 
 		// Finally, run the query
 		$ok = $stmt->execute($allData);
