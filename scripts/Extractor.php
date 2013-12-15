@@ -30,10 +30,14 @@ class Extractor extends SystemBase
 		$matches = array();
 		preg_match_all('/^\[data\]\s*(.+)\s*$/m', $logData, $matches);
 
+		// Extract country/provider from log path, find the provider ID
+		list($country, $provider) = $this->getLogDetails($logFile);
+		$providerId = $this->getProviderId($country, $provider);
+
 		// Retrieve the data from the parenthesis group
 		if (isset($matches[1]))
 		{
-			$this->storeExtractedData($matches[1]);
+			$this->storeExtractedData($matches[1], $providerId);
 		}
 		else
 		{
@@ -44,7 +48,40 @@ class Extractor extends SystemBase
 		$this->moveToProcessedFolder($logFile);
 	}
 
-	protected function storeExtractedData(array $jsonStrings)
+	protected function getLogDetails($logFile)
+	{
+		$logPath = $this->getRoot() . '/logs/new';
+		$relativePath = substr($logFile, strlen($logPath));
+
+		// Grab the country and the provider string
+		$matches = array();
+		preg_match('/^\/([a-z0-9]+)\/([a-z0-9]+)\//i', $relativePath, $matches);
+
+		return array($matches[1], $matches[2],);
+	}
+
+	protected function getProviderId($country, $provider)
+	{
+		$dbh = $this->getDatabaseHandle();
+		$sql = "SELECT id FROM provider WHERE country = :country AND name = :provider";
+		$stmt = $dbh->prepare($sql);
+		if ($stmt === false)
+		{
+			echo "Can't prepare provider search\n";
+		}
+
+		$ok = $stmt->execute(array(':country' => $country, ':provider' => $provider,));
+		if (!$ok)
+		{
+			echo "Can't run provider search\n";
+		}
+
+		$id = $stmt->fetchColumn();
+
+		return $id;
+	}
+
+	protected function storeExtractedData(array $jsonStrings, $providerId)
 	{
 		$allData = array();
 		foreach ($jsonStrings as $jsonString)
@@ -84,7 +121,7 @@ class Extractor extends SystemBase
 
 			$params[] = ':' . $column;
 		}
-		
+
 		$dbh = $this->getDatabaseHandle();
 
 		// Build the query
@@ -95,10 +132,10 @@ class Extractor extends SystemBase
 				scan
 				(provider_id, time_start, time_end, {$columnsList})
 			VALUES
-				(1, 2, 3, $paramList)
+				(:provider_id, 0, 0, $paramList)
 		";
 
-		// @todo Fix placeholder data!
+		// FIXME Fix placeholder data for start/end dates!
 		echo $sql . "\n";
 
 		// Check the query is okay
@@ -109,6 +146,9 @@ class Extractor extends SystemBase
 			die("Error: prepare error when recording data\n");
 			exit();
 		}
+
+		// Set up some parameters not from the log file
+		$allData['provider_id'] = $providerId;
 
 		// Finally, run the query
 		$ok = $stmt->execute($allData);
