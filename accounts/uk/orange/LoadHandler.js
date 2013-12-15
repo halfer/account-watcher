@@ -197,7 +197,8 @@ LoadHandler.prototype.onLoadAllowancePrep = function(page, status)
  * @param page
  * @param targetUrl
  */
-LoadHandler.prototype.onUrlChangedAllowancePrep = function(page, targetUrl) {
+LoadHandler.prototype.onUrlChangedAllowancePrep = function(page, targetUrl)
+{
 	if (targetUrl.indexOf('jfnRC=2') > -1)
 	{
 		this.switchToMainAllowanceScreen(page);
