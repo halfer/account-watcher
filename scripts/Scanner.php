@@ -86,7 +86,7 @@ class Scanner extends SystemBase
 
 		$sql = "
 			SELECT
-				*
+				COUNT(*) AS row_count
 			FROM
 				provider
 			WHERE
@@ -110,7 +110,7 @@ class Scanner extends SystemBase
 			die("Error: query error when checking provider\n");
 		}
 
-		$rows = $stmt->rowCount();
+		$rows = $stmt->fetchColumn();
 		if ($rows === 0)
 		{
 			$insertSql = "
