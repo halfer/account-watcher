@@ -6,6 +6,8 @@
  * @todo Allow data allowances to be configured in accounts.ini
  * @todo Can we get uk/orange working without SSL security disabled? (maybe get a repo of latest certs?)
  * @todo Add in price data from "usage since your last bill" page
+ * @todo Move MB/GB suffix parsing from JavaScript to PHP
+ * @todo Offer recalc sizes console option
  */
 
 // Load base objects using relative path
