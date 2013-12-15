@@ -57,5 +57,6 @@ CREATE TABLE IF NOT EXISTS scan (
 	allowance_remaining INTEGER,
 	usage_total_text VARCHAR,
 	usage_total INTEGER,
-	balance VARCHAR
+	balance_text VARCHAR,
+	balance INTEGER
 );

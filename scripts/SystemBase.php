@@ -25,6 +25,7 @@ class SystemBase
 			'usage_total_text',
 			'usage_total',
 			'balance',
+			'balance_text',
 			'last_updated',
 		);
 

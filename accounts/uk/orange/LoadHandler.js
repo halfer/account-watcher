@@ -227,8 +227,13 @@ LoadHandler.prototype.onLoadAllowanceMain = function(page, status)
 				elementLastUpdated = document.querySelector('#viewRemMinsTextsSummaryForm .bundleUpdated'),
 				textLastUpdated = elementLastUpdated ? elementLastUpdated.innerText : '',
 
+				// Split up currency: £12.34 = 1234p
+				patternBalance = /\d+\.\d+/,
+				balanceMatches = textBalance.match(patternBalance),
+				balanceValue = balanceMatches[0] * 100,
+
 				// Split up format: "123.45 MB used, 6789.01 MB remaining"
-				patternAllowance = /((?:\d+.?\d*) (?:MB|GB)) used, ((?:\d+.?\d*) (?:MB|GB)) remaining/,
+				patternAllowance = /((?:\d+\.?\d*) (?:MB|GB)) used, ((?:\d+\.?\d*) (?:MB|GB)) remaining/,
 				matchesAllowance = textAllowance.match(patternAllowance),
 				textAllowanceUsed = matchesAllowance[1],
 				textAllowanceRemaining = matchesAllowance[2],
@@ -243,7 +248,8 @@ LoadHandler.prototype.onLoadAllowanceMain = function(page, status)
 
 			// Any fields prefixed with "debug_" are not inserted into the database
 			return {
-				balance: textBalance,
+				balance_text: textBalance,
+				balance: balanceValue,
 				debug_allowance_phrase: textAllowance,
 				allowance_used_text: textAllowanceUsed,
 				allowance_remaining_text: textAllowanceRemaining,
